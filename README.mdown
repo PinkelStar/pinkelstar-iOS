@@ -1,0 +1,89 @@
+PinkelStar iPhone/iPhone4/iPad Framework
+========================================
+
+
+This is the home of the PinkelStar iOS client UI Framework. To use this framework you will need to register for a developer
+account at [PinkelStar](http://www.pinkelstar.com). Once registered, you can download the framework by cloning this repository :
+
+    git clone git@github.com:PinkelStar/pinkelstar-iOS-ui.git PinkelStariOSUI
+
+
+This repository contains the entire UI project which you can use as-is or modify to fit the needs of your application.
+
+In the demo app folder you will find a complete and simple test application that uses the PinkelStar framework to build and display different types of like and share buttons. When such a button is pressed, the user can share content with friends on Facebook and/or Twitter.
+
+PinkelStar uses the latest iPhone SDK (iOS4) and Xcode development environment (Xcode 3.2.x). Please upgrade your environment if needed. PinkelStar is fully compatible with iPhone, iPhone4 and iPad and provides native interfaces for each of these platforms.
+
+
+Instructions to run the demo-app
+--------------------------------
+
+The demo app works (almost) out of the box. Open the test_ps_framework.xcodeproj in Xcode, compile and run.
+You will need to add your own Application Key and Secret to the pinkelstar.plist file first (see below for instructions), otherwise the demo will halt with a warning immediately after launch.
+
+
+Instructions for using the PinkelStar iOS library in your own project
+---------------------------------------------------------------------
+Clone the repository using :
+
+	git clone git@github.com:PinkelStar/pinkelstar-iOS-ui.git PinkelStariOSUI
+
+(or via your PinkelStar Developer dashboard).
+
+Contents
+--------
+- A PinkelStar.framework
+- A PinkelStar folder
+- A Changelog.mdown and this README.mdown file
+
+Requirements
+------------
+* Xcode (V2.x)
+* The latest iOS SDK (v4.x)
+* SystemConfiguration.framework, Foundation.framework, QuartzCore.framework, CoreGraphics.framework, UIKit.framework
+* PinkelStar.framework
+* The PinkelStarUI and resources folder
+
+Steps for setting up your first PinkelStar enabled iOS app :
+------------------------------------------------------------
+- Add the PinkelStar Framework to your XCode project
+	- Open your Xcode project and locate your target in the left window pane of Xcode. Press the right mouse button on the target, and choose "Get Info"
+	- A window pops up. Choose the "General" tab in your info window
+	- Towards the bottom of that window you will see an overview of the linked libraries for this target. Add a new linked library by pressing the bottom + sign
+	- When the selection window appears, press the "choose other" button at the bottom left of the window
+	- Locate your copy of the downloaded PinkelStar.framework and add it
+
+- Add all source code and resources
+	- In Finder, Locate the PinkelStar directory that was part of the git clone
+	- Select the folder and drag it into your Xcode project. 
+
+- Enter your application key and secret
+	- You have to register your iPhone app at your developers dashboard panel on www.pinkelstar.com/account/applications
+	- If you have registered your app successfully you should now have an Application Key and Secret (press "edit" on www.pinkelstar.com/account/applications at the right side of your app to view the keys).
+	- Locate the pinkelstar.plist file in your Xcode project. It should be in your Resources group at the left side of your Xcode window.
+	- Double click to open pinkelstar.plist within Xcode and enter your Application Key and Secret there
+	- Save the pinkelstar.plist file
+	- NOTE: THE SOFTWARE WILL NOT RUN IF YOU DO NOT ENTER YOUR OWN APPLICATION KEY AND SECRET
+
+- You are now all set to add a PinkelStar share or like button anywhere in your project.
+	- a. add the PSShareButtonDelegate and PSMainViewControllerDelegate protocol to the view controller in your project that will manage the PinkelStar button.
+	- b. import <PinkelStar/PinkelStar.h> where needed
+	- c. Create a PSShareButton anywhere you want. It can be a standard or your own custom button (check out the PSShareButton header file for details)
+	- d. Implement the psShareButtonPressed delegate callback and there, create a PSMainViewController object. Add it to your view.
+	- e. Implement the psFinished Delegate callback. This will be called when the PinkelStar process is finished or cancelled.
+
+- Download the demo-app Xcode project, and look at the code there.  It shows the above process.
+- Please note that you can customize nearly everything with PinkelStar. You do not need to use the default provided UI elements or buttons. You can set the type of message that the user can share, you can add a URL to content that the user wants to share etc. etc. See the header files for all options.
+
+Compile and run!
+
+Please post feature requests and bug reports to the GitHub issues tab.
+
+If you see a possible improvement or feature which can be added, please fork this project, make the required changes, and
+send us a pull request so we can merge your enhancements in to the master UI project.
+
+Please post your questions to the [support forum](http://support.pinkelstar.com) and we will answer ASAP.
+
+Happy Coding,
+
+The PinkelStar Team
