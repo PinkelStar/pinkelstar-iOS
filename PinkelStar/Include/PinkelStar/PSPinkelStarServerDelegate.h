@@ -54,6 +54,8 @@
 -(void) psServerNotAvailable:(PSPinkelStarServer *) server;
 // This fires if we do not detect Internet on the phone
 -(void) psInternetNotAvailable:(PSPinkelStarServer *) server;
+// This fires if we do detect Internet on the phone (possibly after the connection was down before)
+-(void) psInternetAvailable:(PSPinkelStarServer *) server;
 
 // Unknown Application Key or Secret
 // ENTER your registration details in the pinkelstar.plist.

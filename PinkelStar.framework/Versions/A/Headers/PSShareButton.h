@@ -68,6 +68,7 @@ typedef enum {
 	UILabel *_buttonTitle;
 	UIFont *_buttonTitleFont;
 	UIColor*_buttonTitleColor;
+	BOOL _pinkelStarIcon;
 	
 }
 //the delegate
@@ -79,9 +80,13 @@ typedef enum {
 @property(nonatomic, retain) UILabel *buttonTitle;
 @property(nonatomic, retain) UIFont *buttonTitleFont;
 @property(nonatomic, retain) UIColor *buttonTitleColor;
+@property(nonatomic, retain) UIImageView *pinkelstarIconView;
 
 -(void)setCustomButtonImageName:(NSString *)imageName;
 -(void)setCustomButtonHighlightedImageName:(NSString *)imageName;
+// Call this if you have your own custom button, but you would like to use the
+// PinkelStar icon on it
+-(void)usePinkelStarIcon:(BOOL)use;
 
 - (void)setStyle:(PSShareButtonStyle)style;
 

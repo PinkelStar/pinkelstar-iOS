@@ -108,11 +108,6 @@ typedef enum {
 	
 	// a list of UISwitch objects
 	NSMutableArray *_socialNetworkSwitches;
-	
-	// The lanscape view (iPad only)
-	PSLandscapeMainViewController *_landscapeMainViewController;
-	
-	BOOL isShowingLandscapeMode;
 }
 
 //the delegate
@@ -144,9 +139,6 @@ typedef enum {
 @property (nonatomic, retain) PSPinkelStarServer *psServer;
 @property (nonatomic, retain) PSSocialNetworks *supportedNetworks;
 
-// Landscape
-@property (nonatomic,retain) PSLandscapeMainViewController *landscapeMainViewController;
-// Always init with a delegate
 -(id) initWithDelegate:(id) aDelegate;
 
 // customization of the message that the user will share with friends

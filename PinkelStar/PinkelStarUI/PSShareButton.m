@@ -50,7 +50,7 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 @synthesize buttonTitle = _buttonTitle;
 @synthesize buttonTitleFont = _buttonTitleFont;
 @synthesize buttonTitleColor = _buttonTitleColor;
-
+@synthesize pinkelstarIconView = _pinkelstarIconView;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private
 
@@ -93,32 +93,24 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 		case PSShareButtonStyleSmallGrey:
 		case PSShareButtonStyleSmallPink:
 		case PSShareButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_black" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_share_button_small_black" ofType:@"png"] size];
 			break;
 		case PSShareButtonStyleMediumBlack:
 		case PSShareButtonStyleMediumGrey:
 		case PSShareButtonStyleMediumPink:
 		case PSShareButtonStyleMediumPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_black" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_share_button_medium_black" ofType:@"png"] size];
 			break;
 		case PSShareButtonStyleLargeBlack:
 		case PSShareButtonStyleLargeGrey:
 		case PSShareButtonStyleLargePinkShine:
 		case PSShareButtonStyleLargePink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_black" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_share_button_large_black" ofType:@"png"] size];
 			break;
 		case PSLikeButtonStyleSmallBlack:
 		case PSLikeButtonStyleSmallGrey:
 		case PSLikeButtonStyleSmallPink:
 		case PSLikeButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_pink" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_like_button_small_pink" ofType:@"png"] size];
 			break;
 		case PSShareButtonStyleCustom:
@@ -141,20 +133,15 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 
 -(CGSize) getButtonIconSize
 {
-	//NSString *imagePath;
 	switch (_style)
 	{
 		case PSShareButtonStyleMediumGrey:
 		case PSShareButtonStyleMediumBlack:
 		case PSShareButtonStyleMediumPink:
 		case PSShareButtonStyleMediumPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_button_icon_medium" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_button_icon_medium" ofType:@"png"] size];
 			break;
 		default:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_button_icon_small" ofType:@"png"];
-			//return [[UIImage imageWithContentsOfFile:imagePath] size];
 			return [[self getImage:@"pinkelstar_button_icon_small" ofType:@"png"] size];
 			break;
 	}
@@ -165,27 +152,26 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	CGSize buttonSize = [self getButtonSize];
 	CGSize buttonIconSize = [self getButtonIconSize];
 	
+	DebugLog(@"Button Size =  (%f, %f), button icon size = (%f, %f)", buttonSize.width, buttonSize.height, buttonIconSize.width, buttonIconSize.height);
+	
 	// center the icon on the y-axis and use the same offset at the left side of the button
 	float offset = (buttonSize.height - buttonIconSize.height) / 2.0;
+	if(offset < 0)
+		offset= 0.0;
+	DebugLog(@"Icon frame is now: (%f, %f, %f, %f)", offset, offset, buttonIconSize.width, buttonIconSize.height);
 	return	CGRectMake(offset, offset, buttonIconSize.width, buttonIconSize.height);
 }
 
 -(UIImage *) buttonIconImage
 {
-	//NSString *imagePath;
-	
 	switch (_style) {
 		case PSShareButtonStyleMediumGrey:
 		case PSShareButtonStyleMediumBlack:
 		case PSShareButtonStyleMediumPink:
 		case PSShareButtonStyleMediumPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_button_icon_medium" ofType:@"png"];
-			// return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_button_icon_medium" ofType:@"png"];
 			break;
 		default:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_button_icon_small" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_button_icon_small" ofType:@"png"];
 			break;
 	}
@@ -200,65 +186,41 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	{
 		// Share buttons small
 		case PSShareButtonStyleSmallBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_pink" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_pinkshine" ofType:@"png"];
 			break;
 		// share buttons medium
 		case PSShareButtonStyleMediumBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_pink" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_pinkshine" ofType:@"png"];
 			break;
 		// share buttons large
 		case PSShareButtonStyleLargeBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargeGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargePink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_pink" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargePinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_pinkshine" ofType:@"png"];
 			break;
 		// share button custom
@@ -277,23 +239,15 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 			break;
 		// like buttons
 		case PSLikeButtonStyleSmallBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_black" ofType:@"png"];
 			break;
 		case PSLikeButtonStyleSmallGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_gray" ofType:@"png"];
 			break;
 		case PSLikeButtonStyleSmallPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_pink" ofType:@"png"];
 			break;
 		case PSLikeButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_pinkshine" ofType:@"png"];
 			break;
 			
@@ -312,65 +266,41 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	{
 			// Share buttons small
 		case PSShareButtonStyleSmallBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_pinkshine" ofType:@"png"];
 			break;
 		case PSShareButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_small_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_small_pink" ofType:@"png"];
 			break;
 			// share buttons medium
 		case PSShareButtonStyleMediumBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_pinkshine" ofType:@"png"];
 			break;
 		case PSShareButtonStyleMediumPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_medium_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_medium_pink" ofType:@"png"];
 			break;
 			// share buttons large
 		case PSShareButtonStyleLargeBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_gray" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargeGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_black" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargePink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_pinkshine" ofType:@"png"];
 			break;
 		case PSShareButtonStyleLargePinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_share_button_large_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_share_button_large_pink" ofType:@"png"];
 			break;
 		// share button custom
@@ -389,23 +319,15 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 			break;
 			// like buttons
 		case PSLikeButtonStyleSmallPink:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_pinkshine" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_pinkshine" ofType:@"png"];
 		break;
 		case PSLikeButtonStyleSmallGrey:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_black" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_black" ofType:@"png"];
 			break;
 		case PSLikeButtonStyleSmallBlack:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_gray" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_gray" ofType:@"png"];
 			break;
 		case PSLikeButtonStyleSmallPinkShine:
-			//imagePath = [[NSBundle mainBundle] pathForResource:@"pinkelstar_like_button_small_pink" ofType:@"png"];
-			//return [UIImage imageWithContentsOfFile:imagePath];
 			return [self getImage:@"pinkelstar_like_button_small_pink" ofType:@"png"];
 			break;
 			
@@ -514,26 +436,27 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 }
 
 - (void)updateImage {
-	if (self.highlighted) {
+	if (self.highlighted)
+	{
 		_imageView.image = [self buttonHighlightedImage];
-	} else {
-		_imageView.image = [self buttonImage];
-		if(_style != PSShareButtonStyleCustom)
-		{
-			_pinkelStarIconView.image = [self buttonIconImage];
-			_pinkelStarIconView.frame = [self buttonIconFrame];
-			_buttonTitle.frame = [self buttonTitleFrame];
-		}
-		else {
-			[_pinkelStarIconView removeFromSuperview]; // we don't need it anymore
-			_pinkelStarIconView = nil;
-		}
-
-
-		[_buttonTitleColor release];
-		self.buttonTitleColor = [self getButtonTitleColor];
-		_buttonTitle.textColor = _buttonTitleColor;
 	}
+	else 
+	{
+		_imageView.image = [self buttonImage];
+	}
+	
+	_pinkelStarIconView.image = [self buttonIconImage];
+	_pinkelStarIconView.frame = [self buttonIconFrame];
+	_buttonTitle.frame = [self buttonTitleFrame];
+	
+	if((_style == PSShareButtonStyleCustom) && !_pinkelStarIcon)
+	{
+		[_pinkelStarIconView removeFromSuperview]; // we don't need it anymore
+		_pinkelStarIconView = nil;
+	}
+	[_buttonTitleColor release];
+	self.buttonTitleColor = [self getButtonTitleColor];
+	_buttonTitle.textColor = _buttonTitleColor;
 }
 
 // here we connect the pinkelstar call
@@ -550,7 +473,7 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	_imageView.contentMode = UIViewContentModeCenter;
 	[self addSubview:_imageView];
 	
-	// add a buttonTitel and an icon
+	// add a buttonTitle and an icon
 	_pinkelStarIconView = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
 	_pinkelStarIconView.contentMode = UIViewContentModeCenter;
 	_pinkelStarIconView.image = [self buttonIconImage];
@@ -561,7 +484,6 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	self.buttonTitleColor = [UIColor whiteColor];
 	
 	_buttonTitle = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
-	//_buttonTitle.text = pShareButtonSmallLabel; // this will be set later
 	_buttonTitle.font = _buttonTitleFont;
 	_buttonTitle.shadowColor = [UIColor grayColor];
 	_buttonTitle.shadowOffset = CGSizeMake(-1, -1);
@@ -646,6 +568,9 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	_style = style;
 	
 	// depending on the style we need to set the label of the button
+	if(style == PSShareButtonStyleCustom)
+		_pinkelStarIcon = YES; // you can turn it off later if you want
+
 	[self setButtonTitle];
 	[self updateImage];
 }
@@ -663,6 +588,14 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	if(_customHighlightedImageName)
 		[_customHighlightedImageName release];
 	_customHighlightedImageName = [imageName copy];
+	[self updateImage];
+}
+
+-(void) usePinkelStarIcon:(BOOL)use
+{
+	_pinkelStarIcon = use;
+	_style = PSShareButtonStyleCustom;
+
 	[self updateImage];
 }
 

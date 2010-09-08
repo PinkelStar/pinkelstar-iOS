@@ -1,8 +1,9 @@
 Changelog iOS PinkelStar framework
 ======================================
-Tuesday August 31st 2010
-------------------------
-- Moved all code and resources into a single folder for easy integration into any Xcode project
+Wednesday September 8th 2010
+----------------------------
+- Fixed a bug where the library would crash if the internet Connection went down
+- Reachability now autorecovers. If there is no Internet available the user will be notified properly. If the Internet returns, the user can continue its business properly
 
 Friday August 27th 2010
 -----------------------

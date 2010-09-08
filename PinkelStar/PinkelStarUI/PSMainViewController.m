@@ -117,9 +117,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 @synthesize _prefScrollView;
 @synthesize socialNetworkButtons = _socialNetworkButtons;
 @synthesize contentURL = _contentURL;
-@synthesize landscapeMainViewController = _landscapeMainViewController;
-
-
 
 // start a dialogue to obtain permission to publish to a specific social network
 // Is called in both the preferences view and the main view
@@ -682,7 +679,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 	if(!_blockerLabel)
 	{
-		_blockerLabel = [[UILabel alloc] initWithFrame: CGRectMake(0, 5, _blockerView.bounds.size.width -10, 40)];
+		_blockerLabel = [[[UILabel alloc] initWithFrame: CGRectMake(0, 5, _blockerView.bounds.size.width -10, 40)] autorelease];
 		_blockerLabel.backgroundColor = [UIColor clearColor];
 		_blockerLabel.textColor = [UIColor whiteColor];
 		_blockerLabel.textAlignment = UITextAlignmentCenter;
@@ -691,7 +688,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 	_blockerLabel.text = str;
 	[_blockerView addSubview: _blockerLabel];
-	[_blockerLabel release];
+	//[_blockerLabel release];
 }
 
 // Remove the spinner and text message
@@ -1296,8 +1293,23 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	DebugLog(@"Entering PSMainViewController: psInternetNotAvailable. Updating the blocker message now");
 	[self updateInterfaceWithReachability:NSLocalizedString(@"No Internet detected. Please wait or press cancel to return",@"No Internet detected. Please wait or press cancel to return")];
-	
 }
+
+// This fires if we do detect Internet on the phone (again)
+-(void) psInternetAvailable:(PSPinkelStarServer *) server
+{
+	DebugLog(@"Entering PSMainViewController: psInternetAvailable. Updating the blocker message now");
+	[self updateInterfaceWithReachability:NSLocalizedString(@"Internet detected, loading settings now.",@"Internet detected, loading settings now.")];
+	
+	// We need to see if the service was already initialized correctly before. If that is not the case we know that
+	// the service will autorecover and get a session key from the server. In that specific case we can leave the blocker
+	// view message in sight, as it will be killed as soon as the init is finished.
+	// The test we do is to see if we already have known social network buttons. If they are available the service was
+	// initalized properly
+	if([_socialNetworkButtons count] > 0)
+		[self removeBlockerView];
+}
+
 
 -(void) psInitFinished:(PSPinkelStarServer *) server
 {
@@ -1352,15 +1364,15 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(void) psServerRequestFailed:(PSPinkelStarServer *) server
 {
 	// a server request failed. We now need to fail gracefully
-	DebugLog(@"Entering PSNavigationController:psServerRequestFailed");
+	DebugLog(@"Entering PSMainViewController:psServerRequestFailed");
 	
 	// We will add better error support later, and ensure the specific error can be found
 	// Most likely error is an incorrect APP key and secret.
 	if(_blockerLabel)
 	{
 		// update the text
-		DebugLog(@"PSNavigationController:psServerRequestFailed: there was a blocker view. Update the user message");
-		_blockerLabel.text = NSLocalizedString(@"App Key and/or secret unknown, press cancel to return", @"App Key and/or secret unknown, press cancel to return");
+		DebugLog(@"PSMainController:psServerRequestFailed: there was a blocker view. Update the user message");
+		_blockerLabel.text = NSLocalizedString(@"No Internet detected. Please wait or press cancel to return", @"No Internet detected. Please wait or press cancel to return");
 	}
 	DebugLog(@"PSNavigationController:psServerRequestFailed: No blocker view. we do nothing");
 	
