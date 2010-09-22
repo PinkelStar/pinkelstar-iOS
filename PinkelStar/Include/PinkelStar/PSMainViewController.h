@@ -139,7 +139,8 @@ typedef enum {
 @property (nonatomic, retain) PSPinkelStarServer *psServer;
 @property (nonatomic, retain) PSSocialNetworks *supportedNetworks;
 
--(id) initWithDelegate:(id) aDelegate;
+// Returns the current version nr of the PSPinkelStar UI code
++ (NSString *) version;
 
 // customization of the message that the user will share with friends
 // Set this to make sure the library shows the correct message type

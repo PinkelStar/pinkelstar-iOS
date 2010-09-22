@@ -1,5 +1,12 @@
 Changelog iOS PinkelStar framework
 ======================================
+
+Tuesday September 22st 2010
+---------------------------
+- Fixed a bug that caused addCustmShareMessage not to function properly
+- Added a PSCommon.h file that includes our DebugLog code. Make sure to include that in your project .pch file
+- Added a version nr to both the PinkelStar UI code and the PinkelStar server Framework. Currently set at v 0.9.1;
+
 Wednesday September 8th 2010
 ----------------------------
 - Fixed a bug where the library would crash if the internet Connection went down

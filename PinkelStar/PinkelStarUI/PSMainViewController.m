@@ -129,6 +129,14 @@ static CGFloat permissionViewOffsetY = 26.0;
 	[permView show];
 }
 
+// Current version of the PSPinkelStar UI code
++ (NSString *) version
+{
+	return @"0.9.1";
+	
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // iPhone 4 retina display utility functions
@@ -607,17 +615,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Set the delegate
--(id) initWithDelegate:(id) aDelegate
-{
-	DebugLog(@"Entering initWithDelegate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	self = [super init];
-	if (self != nil) {
-		_delegate = aDelegate;
-		
-	}
-	return self;
-}
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -733,6 +730,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	if(_customShareMessageText)
 		[_customShareMessageText release];
 	_customShareMessageText = [msg copy];
+	_customShareMessageLabel.text = _customShareMessageText;
 	
 }
 

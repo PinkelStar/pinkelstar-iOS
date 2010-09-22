@@ -76,6 +76,9 @@ typedef enum {
 @property (nonatomic, retain) NSMutableArray *psSocialNetworkList;
 @property (nonatomic, retain) NSMutableDictionary *psSocialNetworkIcons;
 
+// returns the version nr of the library
++ (NSString *) version;
+
 // UI information getters
 -(NSString*)getApplicationName;
 -(NSString*)getDeveloperName;

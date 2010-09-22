@@ -1,8 +1,8 @@
-PinkelStar iPhone/iPhone4/iPad Framework
-========================================
+PinkelStar iPhone/iPhone4/iPad Framework v0.9.1
+===============================================
 
 
-This is the home of the PinkelStar iOS client UI Framework. To use this framework you will need to register for a developer
+This is the home of the PinkelStar iOS server Framework. To use this framework you will need to register for a developer
 account at [PinkelStar](http://www.pinkelstar.com). Once registered, you can download the framework by cloning this repository :
 
     git clone git@github.com:PinkelStar/pinkelstar-iOS.git
@@ -14,8 +14,11 @@ We advise to also get our demo app to see a working integration of PinkelStar in
 
 	git clone git:github.com:PinkelStar/pinkelstar-iOS-demo.git
 	
-PinkelStar uses the latest iPhone SDK (iOS4) and Xcode development environment (Xcode 3.2.x). Please upgrade your environment if needed. PinkelStar is fully compatible with iPhone, iPhone4 and iPad and provides native interfaces for each of these platforms.
+ALWAYS REFER TO THIS README.MDOWN FILE FOR THE LATEST INTEGRATION INSTRUCTIONS. WE UPDATE THE FRAMEWORK REGULARLY SO INSTRUCTION VIDEOS AND OTHER SOURCES WILL MOST LIKELY BE OUTDATED
 
+PinkelStar uses the latest iPhone SDK (iOS4.x) and Xcode development environment (Xcode 3.2.x). Please upgrade your environment if needed. PinkelStar is fully compatible with iPhone, iPhone4 and iPad and provides native interfaces for each of these platforms.
+
+Please make sure you are using the latest version of the code base and check GitHub regularly for updates. If we are working on new stuff we'll commit it into different branches. We will merge these branches with master when ready.
 
 Instructions for using the PinkelStar iOS library in your own project
 ---------------------------------------------------------------------
@@ -47,7 +50,8 @@ Steps for setting up your first PinkelStar enabled iOS app :
 
 - Add all source code and resources
 	- In Finder, Locate the PinkelStar directory that was part of the git clone
-	- Select the folder and drag it into your Xcode project. 
+	- Select the folder and drag it into your Xcode project.
+	- Add #include <PSPinkelStar/PSCommon.h> in your projects' .pch file. It contains a DebugLog macro that we use to print debugging info to the console. Yo can enable this macro yourself by adding a -DPS_DEBUG_LOG flag to your linker
 
 - Enter your application key and secret
 	- You have to register your iPhone app at your developers dashboard panel on www.pinkelstar.com/account/applications
