@@ -53,8 +53,8 @@ typedef enum {
 	id<PSPinkelStarServerDelegate> _delegate;
 
 	NSString *_psSessionKey;
-	NSString *applicationName;
-	NSString *developerName;
+	NSString *_applicationName;
+	NSString *_developerName;
 	UIImage *_applicationIcon;
 	NSMutableArray *_psSocialNetworkList;
 	NSMutableDictionary *_psSocialNetworkIcons;
@@ -63,18 +63,34 @@ typedef enum {
 	NSMutableArray *_canPublishToNetworks;
 	NSMutableArray *_serverRequests;
 	
-	// Code reused form Apple that tells us if there is an internet connection
+	// Code reused from Apple that tells us if there is an internet connection
 	// and if the PinkelStar server is available or not
+	// renamed to avoid any kind of linking conflict
 	PSReachability* hostReach;
     PSReachability* internetReach;
     PSReachability* wifiReach;
+	
+	BOOL _initialized; // set to TRUE if the server initalization has been succesfully completed
 }
 
+@property (nonatomic, retain) id<PSPinkelStarServerDelegate> delegate;
 @property (nonatomic, retain) NSString *applicationName;
+@property (nonatomic, retain) UIImage *applicationIcon;
 @property (nonatomic, retain) NSString *developerName;
 @property (nonatomic, retain) NSString *psSessionKey;
 @property (nonatomic, retain) NSMutableArray *psSocialNetworkList;
 @property (nonatomic, retain) NSMutableDictionary *psSocialNetworkIcons;
+@property (nonatomic) BOOL initialized;
+
+// Singleton implementation of the PinkelStar server
++ (PSPinkelStarServer *)sharedInstance;
++ (id)allocWithZone:(NSZone *)zone;
+- (id)copyWithZone:(NSZone *)zone;
+- (id)retain;
+- (NSUInteger)retainCount;
+- (void)release;
+- (id)autorelease;
+
 
 // returns the version nr of the library
 + (NSString *) version;

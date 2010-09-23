@@ -1,5 +1,11 @@
-Changelog iOS PinkelStar framework
-======================================
+Changelog iOS PinkelStar framework v0.9.1.singleton.1
+=====================================================
+
+Tuesday September 23st 2010
+---------------------------
+- New branch with Singleton server implementation
+- Fixed inefficiency that caused the Applicaiton icon to be reloaded too often.
+- Set version nr of this branch to v.0.9.1.singleton.1
 
 Tuesday September 22st 2010
 ---------------------------

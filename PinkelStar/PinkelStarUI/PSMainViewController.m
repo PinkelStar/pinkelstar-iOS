@@ -132,7 +132,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 // Current version of the PSPinkelStar UI code
 + (NSString *) version
 {
-	return @"0.9.1";
+	// return @"0.9.1";
+	return @"v.0.9.1.singleton.1";
 	
 }
 
@@ -197,8 +198,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	// The preferences view consists of a view, with content
 	// and a done button
-	//[self.view bringSubviewToFront:_prefView];
-	//[_prefView setNeedsDisplay];
 	_prefView.hidden = NO;
 	_donePrefButton.hidden = NO;
 	_prefScrollView.hidden = NO;
@@ -392,16 +391,12 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(void) setUpSocialNetworkPrefIcon:(NSInteger) i
 {
 	UIImageView *prefSocialNetworkIconView;
-	//NSString *imagePath;
 	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:i];
 	UIImage *prefIcon =  [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconSmall];
 	
 	// if it doesn't exist yet it will be updated from the server soon
 	if(!prefIcon)
 	{
-		//imagePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"pref_placeholder_icon_small"] ofType:@"png"];
-		DebugLog(@"setupSocialNetworkPreferences: imagePath = %@", networkName);
-		//prefIcon = [UIImage imageWithContentsOfFile:imagePath];
 		prefIcon = [self getImage:@"pref_placeholder_icon_small" ofType:@"png"];
 	}
 	prefSocialNetworkIconView = [[[UIImageView alloc] initWithImage:prefIcon] autorelease];
@@ -419,7 +414,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(void) setupPrefBackgroundImage:(NSInteger) backgroundIndex rows:(NSInteger) rows
 {
 	UIImageView *imgView;
-	//NSString *imagePath;
 	CGRect frame;
 	DebugLog(@"Entering setupPreferencesBackgroundImage");
 	frame = [self calculatePrefRowPosition:backgroundIndex];
@@ -626,9 +620,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 		supportedNetworks = [[PSSocialNetworks alloc] init];
 		
 		// Retrieve the application and developer data
-		// without this call the service will not work
-		DebugLog(@"Setting up the server initialization");
-		psServer = [[PSPinkelStarServer alloc] initWithDelegate:self];
+		psServer = [PSPinkelStarServer sharedInstance];
+		psServer.delegate =  self;
 		
 		// This is really odd. on iPad for some reason these buttons do not work unless we programatically
 		// move them to the front. More people seem to have this issue
@@ -651,7 +644,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// Add the pref view, ad then hide it on ViewDidLoad
 		[self.view addSubview:_prefView];
 
-		//[self.view setNeedsDisplay];
 	}
 	return self;
 }
@@ -685,7 +677,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 	_blockerLabel.text = str;
 	[_blockerView addSubview: _blockerLabel];
-	//[_blockerLabel release];
 }
 
 // Remove the spinner and text message
@@ -699,30 +690,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 }
 
-// We set up parts of our view here
-// Most stuff has been defined in the PSMainViewController.xib file already
-- (void)viewDidLoad {
-    [super viewDidLoad];
-	
-	// Create a spinner animation, until we have loaded our server settings
-	[self setBlockerView:NSLocalizedString(@"Loading your settings...", @"Loading your settings...")];
-
-	// Make sure all preference view elements are not visible
-	[self hidePreferencesView];
-		
-	// Setting the publish button to be rounded
-	[[_publishButton layer] setCornerRadius:8.0f];
-	[[_publishButton layer] setMasksToBounds:YES];
-	[[_publishButton layer] setBorderWidth:1.0f];
-	// set the border color the same as the pink we use
-	[[_publishButton layer] setBorderColor:[[UIColor colorWithRed:0.9098 green:0.043 blue:0.3843 alpha:1.0] CGColor]];
-	
-	// set the button shine
-	[[_publishButtonShine layer] setCornerRadius:8.0f];
-	[[_publishButtonShine layer] setMasksToBounds:YES];
-	[[_publishButtonShine layer] setBorderWidth:1.0f];
-	[[_publishButtonShine layer] setBorderColor:[[UIColor clearColor] CGColor]];
-}
 
 // The custom share message is displayed right next to the app icon
 -(void)addCustomShareMessage:(NSString *) msg
@@ -730,6 +697,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 	if(_customShareMessageText)
 		[_customShareMessageText release];
 	_customShareMessageText = [msg copy];
+	_customShareMessageLabel.text = _customShareMessageText;
+	
 	_customShareMessageLabel.text = _customShareMessageText;
 	
 }
@@ -753,7 +722,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
 	
-	// Release any cached data, images, etc that aren't in use.
 }
 
 - (void)viewDidUnload {
@@ -1220,6 +1188,21 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 }
 
+// Call when we know that the PinkelStar server has send us icons
+-(void) updateInterfaceIcons
+{
+	// hack, for now we update them all
+	// Overhead is minor, but it's ugly. The UI won't update anyways if there are no new icons
+	for(int i = 0; i < [supportedNetworks numberOfSupportedSocialNetworks]; i++)
+	{
+		// main screen
+		[self updateSocialNetworkButtonIcon:i];
+		// pref screen
+		[self updateSocialNetworkPrefIcon:i];
+	}
+	// Update the app icon
+	[self updateAppIcon];
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1273,6 +1256,69 @@ static CGFloat permissionViewOffsetY = 26.0;
 	
 	[self setBlockerView:message];
 }
+
+-(void) roundedCornerPublishButton
+{
+	// Setting the publish button to be rounded
+	[[_publishButton layer] setCornerRadius:8.0f];
+	[[_publishButton layer] setMasksToBounds:YES];
+	[[_publishButton layer] setBorderWidth:1.0f];
+	// set the border color the same as the pink we use
+	[[_publishButton layer] setBorderColor:[[UIColor colorWithRed:0.9098 green:0.043 blue:0.3843 alpha:1.0] CGColor]];
+	
+	// set the button shine
+	[[_publishButtonShine layer] setCornerRadius:8.0f];
+	[[_publishButtonShine layer] setMasksToBounds:YES];
+	[[_publishButtonShine layer] setBorderWidth:1.0f];
+	[[_publishButtonShine layer] setBorderColor:[[UIColor clearColor] CGColor]];	
+}
+
+// We set up parts of our view here
+// Most stuff has been defined in the PSMainViewController.xib file already
+- (void)viewDidLoad {
+    [super viewDidLoad];
+	
+	if(psServer.initialized)
+	{
+		// remove the spinner
+		[self removeBlockerView];
+		
+		// We need to make sure the ViewController is aware of the loaded
+		// developer and application data
+		[self updateDeveloperDetails];
+		
+		// The UI needs to know what networks are supported
+		// We store this locally
+		[self updateSocialNetworkList];
+		
+		// init all icons and buttons using placeholders
+		[self setupButtons];
+		
+		// set up the preferences view
+		// it will not show yet
+		[self setupSocialNetworkPreferenceView];
+		
+		// replace all placeholders with the correct icons
+		[self updateInterfaceIcons];
+		
+	}
+	else 
+		// Create a spinner animation, until we have loaded our server settings
+		// As soon as the server init response is in, the psInit delegate method takes care of everything
+		[self setBlockerView:NSLocalizedString(@"Loading your settings...", @"Loading your settings...")];
+	
+	// Make sure all preference view elements are not visible
+	[self hidePreferencesView];
+	
+	// Setting the publish button to be rounded
+	[self roundedCornerPublishButton];
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// All delegation methods
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // PSPinkelStarServerDelegate
 
@@ -1328,11 +1374,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// the icons need to be donwloaded first
 	
 	// Set up the social network buttons now.
-	
-	//Note: this is initial setup only, we load placeholder icons
-	// The actual social
-	// network icons will need to be downloaded from the server
-	// As soon as they come in we update the view.
+	// Note: this is initial setup only, we load placeholder icons
+	//		The actual social network icons will need to be downloaded from the server
+	//		As soon as they come in we update the view.
 	[self setupButtons];
 	
 	// set up the preferences view
@@ -1389,15 +1433,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	
 	// hack, for now we update them all
 	// Overhead is minor, but it's ugly. The UI won't update anyways if there are no new icons
-	for(int i = 0; i < [supportedNetworks numberOfSupportedSocialNetworks]; i++)
-	{
-		// main screen
-		[self updateSocialNetworkButtonIcon:i];
-		// pref screen
-		[self updateSocialNetworkPrefIcon:i];
-		// Update the app icon
-		[self updateAppIcon];
-	}
+	[self updateInterfaceIcons];
 }
 -(void) psInvalidApplicationKeySecret:(PSPinkelStarServer *) server
 {

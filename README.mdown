@@ -1,8 +1,9 @@
-PinkelStar iPhone/iPhone4/iPad Framework v0.9.1
-===============================================
+PinkelStar iPhone/iPhone4/iPad Framework v0.9.1.singleton.1
+===========================================================
 
+This is a separate branch of the PinkelStar iOS server Framework. We are implementing the PinkelStar server using the Singleton pattern. As you will see in the demo app, it allows us to load the PSMainViewController lazy, as it should be done. Please test at will. Once we are satisfied we will update the main branch of the project.
 
-This is the home of the PinkelStar iOS server Framework. To use this framework you will need to register for a developer
+To use this framework you will need to register for a developer
 account at [PinkelStar](http://www.pinkelstar.com). Once registered, you can download the framework by cloning this repository :
 
     git clone git@github.com:PinkelStar/pinkelstar-iOS.git
@@ -64,9 +65,10 @@ Steps for setting up your first PinkelStar enabled iOS app :
 - You are now all set to add a PinkelStar share or like button anywhere in your project.
 	- a. add the PSShareButtonDelegate and PSMainViewControllerDelegate protocol to the view controller in your project that will manage the PinkelStar button.
 	- b. `import <PinkelStar/PinkelStar.h>` where needed
-	- c. Create a PSShareButton anywhere you want. It can be a standard or your own custom button (check out the PSShareButton header file for details)
-	- d. Implement the psShareButtonPressed delegate callback and there, create a PSMainViewController object. Add it to your view.
-	- e. Implement the psFinished Delegate callback. This will be called when the PinkelStar process is finished or cancelled.
+	- c. Call [PSPinkelStarServer sharedInstance] at application launch. This will ensure that the PinkelStar sharing UI is up to date when the user invokes it
+	- d. Create a PSShareButton anywhere you want. It can be standard or your own custom button (check out the PSShareButton header file for details)
+	- e. Implement the psShareButtonPressed delegate callback and there, create a PSMainViewController object. Add it to your view.
+	- f. Implement the psFinished Delegate callback. This will be called when the PinkelStar process is finished or cancelled.
 
 - The demo app mentioned earlier clearly demonstrates the integration process above
 
