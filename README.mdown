@@ -9,6 +9,10 @@ account at [PinkelStar](http://www.pinkelstar.com). Once registered, you can dow
     git clone git@github.com:PinkelStar/pinkelstar-iOS.git
 
 
+Make sure you switch to the correct branch using:
+
+	git checkout -b /remotes/origin/SingletonServer2
+	
 This repository contains the entire UI project which you can use as-is or modify to fit the needs of your application.
 
 We advise to also get our demo app to see a working integration of PinkelStar in an iOS app. You can get a copy of the demo app by cloning this repository:
