@@ -32,44 +32,12 @@
 //  Created by Alexander van Elsas on 6/17/10.
 
 #import "PSMainViewController.h"
+#import "PSSettingsViewController.h"
 #import "PSPinkelStarServer.h"
 #import "PSSocialNetworks.h"
 #import "PSPermissionView.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreGraphics/CGImage.h>
-
-// Prefs view
-static CGFloat prefRowWidth = 302.0;
-static CGFloat prefRowHeight = 45.0;
-static CGPoint prefRowOrigin = {0.0, 0.0};
-// the social network icons
-static CGFloat prefIconWidth = 34.0;
-static CGFloat prefIconHeight = 34.0;
-static CGPoint prefIconOrigin = {10.0, 0.0};
-// the social network label
-static CGFloat prefLabelWidth = 200.0;
-static CGFloat prefLabelHeight = 20.0;
-static CGPoint prefLabelOrigin = {50.0, 0.0};
-// the social network Switch
-static CGFloat prefSwitchHeight = 27.0;
-static CGPoint prefSwitchOrigin = {200.0, 0.0};
-
-// iPad
-static CGFloat prefRowWidth_iPad = 488.0;
-static CGFloat prefRowHeight_iPad = 65.0;
-static CGPoint prefRowOrigin_iPad = {30.0, 0.0};
-// the social network icons
-static CGFloat prefIconWidth_iPad = 65.0;
-static CGFloat prefIconHeight_iPad = 48.0;
-static CGPoint prefIconOrigin_iPad = {46.0, 10.0};
-// the social network label
-static CGFloat prefLabelWidth_iPad = 250.0;
-static CGFloat prefLabelHeight_iPad = 12.0;
-static CGPoint prefLabelOrigin_iPad = {115.0, 0.0};
-// the social network Switch
-static CGFloat prefSwitchWidth_iPad = 94.0;
-static CGFloat prefSwitchHeight_iPad = 27.0;
-static CGPoint prefSwitchOrigin_iPad = {400.0, 0.0};
 
 // Main view
 // The buttons
@@ -85,8 +53,6 @@ static CGFloat buttonSpaceY = 13.0;
 // iPad
 static CGFloat buttonWidth_iPad = 114.0;
 static CGFloat buttonHeight_iPad = 122.0;
-//static CGFloat buttonIconWidth_iPad = 80.0;
-//static CGFloat buttonIconHeight_iPad = 60.0;
 static CGPoint buttonOrigin_iPad = {66.0,0.0};
 static CGFloat buttonSpaceX_iPad = 34.0;
 static CGFloat buttonSpaceY_iPad = 34.0;
@@ -98,7 +64,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 @implementation PSMainViewController
 
-@synthesize delegate = _delegate;
+@synthesize psMainDelegate = _psMainDelegate;
+@synthesize _mainView;
 @synthesize userMessage;
 @synthesize _customShareMessageLabel;
 @synthesize _customShareMessageText;
@@ -112,14 +79,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 @synthesize _publishButton;
 @synthesize _publishButtonShine;
 @synthesize _prefButton;
-@synthesize _prefView;
-@synthesize _donePrefButton;
-@synthesize _prefScrollView;
 @synthesize socialNetworkButtons = _socialNetworkButtons;
 @synthesize contentURL = _contentURL;
 
 // start a dialogue to obtain permission to publish to a specific social network
-// Is called in both the preferences view and the main view
 - (void) getPermissionPS:(NSString *) networkName
 {
 	PSPermissionView *permView = [[[PSPermissionView alloc] initWithDelegate:self] autorelease];
@@ -152,7 +115,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 		return NO;
 }
 
-// Temp method needed because Apple hasn't fixed all image functions yet to laod highres images for iPhone 4 when needed
+// Temp method needed because Apple hasn't fixed all image functions yet to load highres images for iPhone 4 when needed
 // Didn't implement this as a category on purpose as that provides too many compatibility issues wit devices
 // We accept the minor code duplication for now
 -(UIImage *) getImage:(NSString *) imageName ofType:(NSString *) ofType
@@ -174,7 +137,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 }
 
 // Whenever we load an image form a server we detect first if we are on a retina display. If so we get a highres image
-// This methid prevents iOS to scale that image 2x (no need as it is high res already)
+// This method prevents iOS to scale that image 2x (no need as it is high res already)
 -(UIImage *) adjustImageScaleForRetinaDisplay:(UIImage *) someImage width:(CGFloat)width height:(CGFloat) height
 { 
 	CGRect frame = CGRectMake(0, 0, width, height); // we really need 122x92 for high resh
@@ -196,383 +159,18 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 -(void) showPreferencesView
 {
-	// The preferences view consists of a view, with content
-	// and a done button
-	_prefView.hidden = NO;
-	_donePrefButton.hidden = NO;
-	_prefScrollView.hidden = NO;
-	_prefButton.hidden = YES;
-	
-}
-
--(void) hidePreferencesView
-{
-	// The preferences view consists of a view, with content
-	// and a done button
-	_prefView.hidden = YES;
-	_donePrefButton.hidden = YES;
-	_prefScrollView.hidden = YES;
-	_prefButton.hidden = NO;
-}
-
-// Clearing all cookies will ensure that when a user revokes a permission
-// he will need to log in again first the next time he wishes to publish 
-// to that social network again
--(void) clearCookies:networkName
-{
-	DebugLog(@"Clearing all cookies for this network: %@", networkName);
-	NSHTTPCookie *cookie;
-	for (cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
-		if([[cookie domain] isEqual:[NSString stringWithFormat:@".%@.com", networkName]])
-		{
-			DebugLog(@"Removing this cookie now: %@", cookie);
-			[[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
-		}
-	}
-}
-
-// As soon as the icon has been loaded from the PinkelStar server we call this
-// to replace the placeholder icon with the correct social network icon
--(void) updateSocialNetworkPrefIcon:(NSInteger) networkIndex
-{
-	DebugLog(@"Entering updateSocialNetworkPrefIcon");
-	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:networkIndex];
-	UIImage *prefIcon;
-	
-	// update this icon in the prefs view now
-	if(networkIndex != NSNotFound)
-	{
-		prefIcon = [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconSmall];
-		if(prefIcon)
-		{
-			if ([self currentDeviceIsRetinaDisplay])
-			{
-				// we need to adjust the image, as iOS will try to scale it to 2.0
-				[[_socialNetworkPrefIcons objectAtIndex:networkIndex] 
-				 setImage:[self adjustImageScaleForRetinaDisplay:prefIcon width:prefIconWidth height:prefIconHeight]];		
-				
-			}
-			else
-			{
-				[[_socialNetworkPrefIcons objectAtIndex:networkIndex] setImage:prefIcon];
-			}
-			
-		}
-		else {
-			DebugLog(@"updateSocialNetworkPrefIcon: nothing to update");
-		}
-	}
-	else 
-		DebugLog(@"updateSocialNetworkPrefIcon: Unknown icon for network name = %@", networkName);
-	
-}
-
--(void) toggleSocialNetworkPrefSwitch:(NSString *) networkName
-{
-	// Locate the switch and toggle its value. We don't care what it was before
-	// all we know is it was changed
-	UISwitch *prefSwitch = [_socialNetworkSwitches objectAtIndex:[supportedNetworks getIndexFromNetworkName:networkName]];
-	BOOL onOrOff = prefSwitch.isOn;
-	[prefSwitch setOn:!onOrOff animated:NO];	
-}
-
-// position the Social Network icon in the prefs view
--(CGRect) calculatePrefSocialNetworkIconPosition:(NSInteger) row
-{
-	// We position the rows in a grid
-	float iconOffsetY;
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-	{
-		// iconOffsetY = (prefRowHeight_iPad - prefIconHeight_iPad) / 2.0;
-		iconOffsetY = 5.0;
-		DebugLog(@"Row nr == %d, or in float %f", row, (float) row);
-		DebugLog(@"Positioning an icon at: (%f, %f)", prefIconOrigin_iPad.x, prefIconOrigin_iPad.y + (float) row * prefRowHeight_iPad + iconOffsetY);
-		return CGRectMake(prefIconOrigin_iPad.x,
-						  prefIconOrigin_iPad.y + (float) row * (prefRowHeight_iPad - iconOffsetY),
-						  prefIconWidth_iPad, 
-						  prefIconHeight_iPad);
-	}
-	else
-	{
-		iconOffsetY = (prefRowHeight - prefIconHeight) / 2;
-	
-		DebugLog(@"Positioning an icon at: (%f, %f)", prefIconOrigin.x, prefIconOrigin.y + (float) row * prefRowHeight + iconOffsetY);
-		return CGRectMake(prefIconOrigin.x,
-						  prefIconOrigin.y + (float) row * prefRowHeight + iconOffsetY,
-						  prefIconWidth, 
-						  prefIconHeight);
-	}
-	
-}
-
-// position the Social Network label in the prefs view
--(CGRect) calculatePrefSocialNetworkLabelPosition:(NSInteger) row
-{
-	// We position the rows in a grid. Each row is of size: 302x45 (wxh)
-	// The row starts at position (0, 0), labels are always placed at (50, y)
-	// The icon is centered in the row, and positioned on the left
-	float labelOffsetY;
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-	{
-		labelOffsetY = (prefRowHeight_iPad - prefLabelHeight_iPad) / 2;
-		
-		DebugLog(@"Positioning a label at: (%f, %f)", prefLabelOrigin_iPad.x, prefLabelOrigin_iPad.y + (float) row * prefRowHeight_iPad + labelOffsetY);
-		return CGRectMake(prefLabelOrigin_iPad.x,
-						  prefLabelOrigin_iPad.y + (float) row * prefRowHeight_iPad + labelOffsetY,
-						  prefLabelWidth_iPad, 
-						  prefLabelHeight_iPad);
-		
-	}
-	else
-	{
-		labelOffsetY = (prefRowHeight - prefLabelHeight) / 2;
-	
-		DebugLog(@"Positioning a label at: (%f, %f)", prefLabelOrigin.x, prefLabelOrigin.y + (float) row * prefRowHeight + labelOffsetY);
-		return CGRectMake(prefLabelOrigin.x,
-						  prefLabelOrigin.y + (float) row * prefRowHeight + labelOffsetY,
-						  prefLabelWidth, 
-						  prefLabelHeight);
-	}
-}
-
-// position the Social Network switch in the prefs view
--(CGRect) calculatePrefSocialNetworkSwitchPosition:(NSInteger) row
-{
-	// We position the rows in a grid. Each row is of size: 302x45 (wxh) iPhone, and 488x66 iPad
-	// The row starts at position (0, 0)
-	// the slider is positioned on the right, centered, always placed at (200, y)
-	CGFloat switchOffsetY;
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-	{
-		switchOffsetY = (prefRowHeight_iPad - prefSwitchHeight_iPad) / 2;
-		
-		DebugLog(@"Positioning a switch at: (%f, %f)", prefSwitchOrigin_iPad.x, prefSwitchOrigin_iPad.y + (float) row * prefRowHeight_iPad + switchOffsetY);
-		return CGRectMake(prefSwitchOrigin_iPad.x,
-						  prefSwitchOrigin_iPad.y + (float) row * prefRowHeight_iPad + switchOffsetY,
-						  prefSwitchWidth_iPad, 
-						  prefSwitchHeight_iPad);
-	}
-	else
-	{
-		switchOffsetY = (prefRowHeight - prefSwitchHeight) / 2;
-	
-		DebugLog(@"Positioning a switch at: (%f, %f)", prefSwitchOrigin.x, prefSwitchOrigin.y + (float) row * prefRowHeight + switchOffsetY);
-		return CGRectMake(prefSwitchOrigin.x,
-						  prefSwitchOrigin.y + (float) row * prefRowHeight + switchOffsetY,
-						  prefRowWidth, 
-						  prefRowHeight);
-	}
-}
-
-// position the Social Network pref row in the prefs view
--(CGRect) calculatePrefRowPosition:(NSInteger) row
-{
-	// We position the rows in a grid. Each row is of size: 302x45 (wxh) iPhone, or 488x65 iPad
-	// The row starts at position (0, 0)
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-	{
-		DebugLog(@"Positioning a row at: (%f, %f)", prefRowOrigin_iPad.x, prefRowOrigin_iPad.y + (float) row * prefRowHeight_iPad);
-		return CGRectMake(prefRowOrigin_iPad.x,
-						  prefRowOrigin_iPad.y + (float) row * prefRowHeight_iPad,
-						  prefRowWidth_iPad, 
-						  prefRowHeight_iPad);
-	}
-	else
-	{
-		DebugLog(@"Positioning a row at: (%f, %f)", prefRowOrigin.x, prefRowOrigin.y + (float) row * prefRowHeight);
-		return CGRectMake(prefRowOrigin.x,
-					  prefRowOrigin.y + (float) row * prefRowHeight,
-					  prefRowWidth, 
-					  prefRowHeight);
-	}
-}
-
-// Place the Social Network icon in the prefs view
--(void) setUpSocialNetworkPrefIcon:(NSInteger) i
-{
-	UIImageView *prefSocialNetworkIconView;
-	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:i];
-	UIImage *prefIcon =  [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconSmall];
-	
-	// if it doesn't exist yet it will be updated from the server soon
-	if(!prefIcon)
-	{
-		prefIcon = [self getImage:@"pref_placeholder_icon_small" ofType:@"png"];
-	}
-	prefSocialNetworkIconView = [[[UIImageView alloc] initWithImage:prefIcon] autorelease];
-	prefSocialNetworkIconView.contentMode = UIViewContentModeCenter;
-	prefSocialNetworkIconView.frame = [self calculatePrefSocialNetworkIconPosition:i];
-	
-	// we store this locally so that we can update the view when the server sends us the correct icons
-	[_socialNetworkPrefIcons addObject:prefSocialNetworkIconView];
-	
-	[_prefScrollView addSubview:prefSocialNetworkIconView];
-}
-
-// Place a background image for each pref
-// We may at some point use coregrapics to reduce image usage, but for now this is fine
--(void) setupPrefBackgroundImage:(NSInteger) backgroundIndex rows:(NSInteger) rows
-{
-	UIImageView *imgView;
-	CGRect frame;
-	DebugLog(@"Entering setupPreferencesBackgroundImage");
-	frame = [self calculatePrefRowPosition:backgroundIndex];
-	
-	// We need separate images for iPad
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-	{
-		// the top row has rounded corners
-		if(backgroundIndex == 0)
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_toprow_bg_iPad" ofType:@"png"]] autorelease];
-		}
-		else if(backgroundIndex == rows -1)
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_bottomrow_bg_iPad" ofType:@"png"]] autorelease];
-		}
-		// the bottom row has rounded corners
-		else
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_row_bg_iPad" ofType:@"png"]] autorelease];
-		}
-	}
-	else
-	{
-		// the top row has rounded corners
-		if(backgroundIndex == 0)
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_toprow_bg" ofType:@"png"]] autorelease];
-		}
-		else if(backgroundIndex == rows -1)
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_bottomrow_bg" ofType:@"png"]] autorelease];
-		}
-		// the bottom row has rounded corners
-		else
-		{
-			imgView = [[[UIImageView alloc] initWithImage:[self getImage:@"pref_table_row_bg" ofType:@"png"]] autorelease];
-		}
-	}
-	imgView.frame = frame;
-	[_prefScrollView addSubview:imgView];
-}
-
-// Create a social network switch label in the pref view
--(void) setSocialNetworkPrefSwitchLabel:(NSInteger) switchIndex
-{
-	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:switchIndex];
-	UILabel *switchLabel = [[[UILabel alloc] initWithFrame:[self calculatePrefSocialNetworkLabelPosition:switchIndex]] autorelease];
-	
-	switchLabel.text = networkName;
-	switchLabel.backgroundColor = [UIColor clearColor];
-	switchLabel.textColor = [UIColor whiteColor];
-	switchLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:(15.0)];
-	
-	[_prefScrollView addSubview: switchLabel];
-}
-
-// Create a social network switch in the pref view
--(void) setSocialNetworkPrefSwitch:(NSInteger) switchIndex
-{
-	UISwitch *prefSwitch;
-	NSString *networkName;
-	
-	networkName = [supportedNetworks getNetworkNameFromIndex:switchIndex];
-	DebugLog(@"setupSocialNetworkPreferences: networkName = %@", networkName);
-	prefSwitch = [[[UISwitch alloc] initWithFrame:[self calculatePrefSocialNetworkSwitchPosition:switchIndex]] autorelease];
-	[prefSwitch addTarget: self action: @selector(socialNetworkSwitchChanged:) forControlEvents:UIControlEventValueChanged];
-	// this will help us remember what switch was touched. It has the same index as the networkName
-	[prefSwitch setTag:switchIndex];
-	[_socialNetworkSwitches addObject:prefSwitch];
-	
-	if([psServer canPublishPS:networkName])
-	{
-		// We can publish to this network, so set slider to true
-		[prefSwitch setOn:YES animated:NO];			
-	}
+	PSSettingsViewController *newController;
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		newController = [[[PSSettingsViewController alloc] initWithNibName:[NSString stringWithString:@"PSSettingsViewController_iPad"] bundle:nil] autorelease];
+	} 
 	else 
 	{
-		// we can't publish to this network so set it to false
-		[prefSwitch setOn:NO animated:NO];			
+		newController = [[[PSSettingsViewController alloc] initWithNibName:[NSString stringWithString:@"PSSettingsViewController_iPhone"] bundle:nil] autorelease];
 	}
-	[_prefScrollView addSubview:prefSwitch];
-	
+	newController.delegate = self;
+	[self.navigationController pushViewController:newController animated:YES];		
 }
 
-// call this to set up the Preferences view as soon as the initial
-// server response is in
-// It will not be displayed until we call showPreferencesView
--(void) setupSocialNetworkPreferenceView
-{
-	NSInteger nrOfNetworks = [supportedNetworks numberOfSupportedSocialNetworks];
-	
-	if(!_socialNetworkSwitches)
-		_socialNetworkSwitches = [[NSMutableArray alloc] init];
-	if(!_socialNetworkPrefIcons)
-		_socialNetworkPrefIcons = [[NSMutableArray alloc] init];
-	
-	// We need a row for each Social Network
-	// Every row has a background image, a social network icon, a label and a switch
-	for(int i=0; i < nrOfNetworks; i++)
-	{
-		// Set up the Social Network icon background
-		[self setupPrefBackgroundImage:i rows:nrOfNetworks];
-		// Set up the Social Network icon
-		[self setUpSocialNetworkPrefIcon:i];
-		// a label for the network name
-		[self setSocialNetworkPrefSwitchLabel:i];
-		// and the switch itself
-		[self setSocialNetworkPrefSwitch:i];
-	}
-}
-
-// The user altered the social network pref switch
--(IBAction) socialNetworkSwitchChanged:(id)sender
-{
-	DebugLog(@"Entering socialNetworkSwitchChanged");
-	
-	UISwitch *socialNetworkSwitch = (UISwitch *) sender;
-	BOOL setting = socialNetworkSwitch.isOn;
-	
-	// if the switch was On ad it is turned off, we need to call
-	// revokePermission
-	
-	// If the switch was off and it is turned on, we need to
-	// call our webView to get the permission
-	
-	// first, locate the switch an figure out what network it belongs to
-	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:socialNetworkSwitch.tag];
-	
-	if(setting)
-	{
-		DebugLog(@"The switch is on now %@", networkName);
-		if(![psServer canPublishPS:networkName])
-			// open a modal view to get the permission
-			[self getPermissionPS:networkName];
-		else
-			// This is odd
-			DebugLog(@"socialNetworkSwitchChanged: switch is set to ON, but we already have permission according to the PinkelStar server??");
-	}
-	else 
-	{
-		DebugLog(@"The switch is off now for %@", networkName);
-		// if it is turned off, we will call revoke now forcing the user to provide permission later if he wants
-		// to publish to this network again
-		
-		// make sure we store this change locally
-		[supportedNetworks setSocialNetworkSelection:networkName selected:NO];
-		[supportedNetworks setWillPublishToNetwork:networkName done:NO];
-		
-		// And now tell the server to revoke the permission on behalf of the user
-		[psServer revokePermissionPS:networkName];
-		
-		// as a final measure, we clear the network cookies to ensure the user
-		// really needs to log in again next time he wants to publish to the social network
-		[self clearCookies:networkName];
-	}
-	
-	
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // End preferences view methods
@@ -588,7 +186,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-		DebugLog(@"iPad detected, autorotation is turned on..................................");
         return YES; // supports all orientations
     }
 	else if(interfaceOrientation == UIInterfaceOrientationPortrait)
@@ -614,7 +211,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         // Custom initialization
-		DebugLog(@"Entering initWithNibName!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NibName == %@", nibNameOrNil);
 		// Setup a local object that contains the supported Social Networks
 		// Note that this will be UPDATED as soon as the server returns with the psInitFinished callback!
 		supportedNetworks = [[PSSocialNetworks alloc] init];
@@ -622,30 +218,38 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// Retrieve the application and developer data
 		psServer = [PSPinkelStarServer sharedInstance];
 		psServer.delegate =  self;
-		
-		// This is really odd. on iPad for some reason these buttons do not work unless we programatically
-		// move them to the front. More people seem to have this issue
-		// see : http://stackoverflow.com/questions/3345499/ipad-ibaction-for-uibutton-responds-on-iphone-device-not-on-ipad
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
-		{
-			[self.view bringSubviewToFront:_cancelButton];	//moves the button above other subviews
-			[_cancelButton setNeedsDisplay];				//ensure the button is redrawn
-			[self.view bringSubviewToFront:_prefButton];
-			[_prefButton setNeedsDisplay];
-			[self.view bringSubviewToFront:userMessage];
-			[userMessage setNeedsDisplay];			
-		}
-		
+				
 		// Adding the buttonView now
 		_buttonScrollView.scrollEnabled = YES;
 		[_buttonScrollView setContentSize:CGSizeMake(200.0, 400.0)];
 		[_buttonScrollView setNeedsDisplay];
+		
+		// Set up the navigation controller
+		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
+		self.navigationItem.leftBarButtonItem = cancelButton;
 
-		// Add the pref view, ad then hide it on ViewDidLoad
-		[self.view addSubview:_prefView];
-
+		
+		UIButton* prefButton = [UIButton buttonWithType:UIButtonTypeCustom];
+		[prefButton addTarget:self action:@selector(prefButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+		[prefButton setBackgroundImage:[self getImage:@"PinkelStar_icon" ofType:@"png"] forState:UIControlStateNormal];
+		[prefButton setBackgroundImage:[self getImage:@"PinkelStar_icon" ofType:@"png"] forState:UIControlStateHighlighted];
+		prefButton.frame = CGRectMake(0, 0, 30, 30);
+		UIBarButtonItem *prefButtonItem = [[UIBarButtonItem alloc] initWithCustomView:prefButton];
+		self.navigationItem.rightBarButtonItem = prefButtonItem;
+		[prefButtonItem release];
+		
+			
+		self.title = @"Share";
+		self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1.0];
+		
+		
 	}
 	return self;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1.0];
 }
 
 -(void) setBlockerView:(NSString *)str
@@ -737,12 +341,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 	_socialNetworkButtons = nil;
 	_contentURL = nil;
 	_socialNetworkButtons = nil;
-	_socialNetworkPrefIcons = nil;
 }
 
 
 - (void)dealloc {
-	DebugLog(@"PSMainViewController DEALLOC");
 	[userMessage release];
 	[supportedNetworks release];
 	[psServer release];
@@ -752,10 +354,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 		[_customShareMessageText release];
 	if(_contentURL)
 		[_contentURL release];
-	if(_socialNetworkSwitches)
-		[_socialNetworkSwitches release];
-	if(_socialNetworkPrefIcons)
-		[_socialNetworkPrefIcons release];
 	
     [super dealloc];
 }
@@ -894,10 +492,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	// time to close down pinkelstar and hand back control to the host app
 	// Pop to root first for memory cleanup
-	DebugLog(@"PSMainViewController:finishPS, cleaning up now");
 	
-	if ([_delegate respondsToSelector:@selector(psFinished:)])
-		[_delegate psFinished:self];
+	if ([_psMainDelegate respondsToSelector:@selector(psFinished:)])
+		[_psMainDelegate psFinished:self];
 	else
 		DebugLog(@"PSMainViewController: _psdelegate doesn't respond to psFinished?");
 }
@@ -957,10 +554,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	[self updateAppIcon];
 }
 
--(void) updateSocialNetworkList
-{
-	[supportedNetworks updateSocialNetworks:[psServer getSocialNetworksPS]];
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1018,14 +611,12 @@ static CGFloat permissionViewOffsetY = 26.0;
 	
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 
 	{
-		DebugLog(@"Positioning a button at: (%f, %f)", buttonOrigin_iPad.x + column * (buttonWidth_iPad + buttonSpaceX_iPad), buttonOrigin_iPad.y + (float) row *(buttonHeight_iPad + buttonSpaceY_iPad));
 		return CGRectMake(buttonOrigin_iPad.x + column * (buttonWidth_iPad + buttonSpaceX_iPad),
 						  buttonOrigin_iPad.y + (float) row *(buttonHeight_iPad + buttonSpaceY_iPad),
 						  buttonWidth_iPad, 
 						  buttonHeight_iPad);
 	}
 	else {
-		DebugLog(@"Positioning a button at: (%f, %f)", buttonOrigin.x + column * (buttonWidth + buttonSpaceX), buttonOrigin.y + (float) row *(buttonHeight + buttonSpaceY));
 		return CGRectMake(buttonOrigin.x + column * (buttonWidth + buttonSpaceX),
 						  buttonOrigin.y + (float) row *(buttonHeight + buttonSpaceY),
 						  buttonWidth, 
@@ -1038,7 +629,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 // we have received from the server
 -(void) updateSocialNetworkButtonIcon:(NSInteger) buttonIndex
 {
-	DebugLog(@"Entering updateSocialNetworkButtonIcon");
 	NSString *networkName = [supportedNetworks getNetworkNameFromIndex:buttonIndex];
 	UIImage *buttonImage;
 	if(buttonIndex != NSNotFound)
@@ -1088,14 +678,20 @@ static CGFloat permissionViewOffsetY = 26.0;
 	{
 		// Check to see if we need to select or deselect it
 		if([psServer canPublishPS:networkName])
+		{
 			[self selectButton:[_socialNetworkButtons objectAtIndex:buttonIndex] networkName:networkName];
+		}
 		else 
+		{
+			// make sure we store this change locally
+			[supportedNetworks setSocialNetworkSelection:networkName selected:NO];
+			[supportedNetworks setWillPublishToNetwork:networkName done:NO];
 			[self deselectButton:[_socialNetworkButtons objectAtIndex:buttonIndex] networkName:networkName];
+		}
 
 	}
 	else 
 		DebugLog(@"updateButtonState: Unknown button for network name = %@", networkName);
-	
 }
 
 // Note that we create a default button with a placeholder image here
@@ -1152,6 +748,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 	[aButton addTarget:self action:@selector(socialNetworkButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 	[aButton setTitle:networkName forState:UIControlStateNormal];
+	aButton.titleLabel.shadowColor = [UIColor darkTextColor];
+	aButton.titleLabel.shadowOffset = CGSizeMake(0, -1);
+
 
 }
 
@@ -1163,7 +762,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// 2. Set it's status correct. If we already have permission to publish we
 	//    will select the button, otherwise we will deselect it
 	// Note that the actual network icons are loaded in the background
-	NSArray *networks = [supportedNetworks getSupportedSocialNetworks];
+	NSArray *networks = [psServer getSupportedSocialNetworks];
 	if([networks count] > 0)
 	{
 		for(int i=0;i< [networks count]; i++)
@@ -1193,12 +792,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	// hack, for now we update them all
 	// Overhead is minor, but it's ugly. The UI won't update anyways if there are no new icons
-	for(int i = 0; i < [supportedNetworks numberOfSupportedSocialNetworks]; i++)
+	for(int i = 0; i < [psServer numberOfSupportedSocialNetworks]; i++)
 	{
 		// main screen
 		[self updateSocialNetworkButtonIcon:i];
-		// pref screen
-		[self updateSocialNetworkPrefIcon:i];
 	}
 	// Update the app icon
 	[self updateAppIcon];
@@ -1213,7 +810,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(IBAction)cancelButtonPressed
 {	
 	// time to close down pinkelstar and hand back control to the host app
-	DebugLog(@"Cancel Button pressed, sending a cancel request now");
 	// we log the cancel for stats purposes for the developer
 	[psServer userCancelsPS];
 	
@@ -1222,11 +818,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 -(IBAction)prefButtonPressed
 {
-	DebugLog(@"pref Button pressed, opening a pref dialog now");
-	
-	// The button only needs to do something if the prefs are not shown
-	if(_prefView.hidden)
-		[self showPreferencesView];
+	[self showPreferencesView];
 }
 
 
@@ -1236,18 +828,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 		[self publishPS];
 	else
 		[self alertCantPublishYet];
-}
-
--(IBAction)donePrefButtonPressed
-{
-	DebugLog(@"Preferences Save Button Pressed");
-	
-	// 1. we hide the preferences view
-	[self hidePreferencesView];
-	// 2. we check to see if any social network buttons need to be selected/deselected
-	for(int i=0;i<[supportedNetworks numberOfSupportedSocialNetworks]; i++)
-		[self updateButtonState:[supportedNetworks getNetworkNameFromIndex:i]];
-	
 }
 
 // called when reachability has changed (for example we've lost an Internet connection)
@@ -1286,18 +866,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// We need to make sure the ViewController is aware of the loaded
 		// developer and application data
 		[self updateDeveloperDetails];
-		
-		// The UI needs to know what networks are supported
-		// We store this locally
-		[self updateSocialNetworkList];
-		
+				
 		// init all icons and buttons using placeholders
 		[self setupButtons];
-		
-		// set up the preferences view
-		// it will not show yet
-		[self setupSocialNetworkPreferenceView];
-		
+				
 		// replace all placeholders with the correct icons
 		[self updateInterfaceIcons];
 		
@@ -1306,9 +878,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// Create a spinner animation, until we have loaded our server settings
 		// As soon as the server init response is in, the psInit delegate method takes care of everything
 		[self setBlockerView:NSLocalizedString(@"Loading your settings...", @"Loading your settings...")];
-	
-	// Make sure all preference view elements are not visible
-	[self hidePreferencesView];
 	
 	// Setting the publish button to be rounded
 	[self roundedCornerPublishButton];
@@ -1357,18 +926,13 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 -(void) psInitFinished:(PSPinkelStarServer *) server
 {
-	DebugLog(@"ENTERING psInitFinished now....xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	// remove the spinner
 	[self removeBlockerView];
 	
 	// We need to make sure the ViewController is aware of the loaded
 	// developer and application data
 	[self updateDeveloperDetails];
-	
-	// The UI needs to know what networks are supported
-	// We store this locally
-	[self updateSocialNetworkList];
-	
+
 	// We wil have to wait for successive request to finish to see 
 	// what social network buttons we add to the interface
 	// the icons need to be donwloaded first
@@ -1378,10 +942,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	//		The actual social network icons will need to be downloaded from the server
 	//		As soon as they come in we update the view.
 	[self setupButtons];
-	
-	// set up the preferences view
-	// it will not show yet
-	[self setupSocialNetworkPreferenceView];
 }
 
 -(void) psPublishRequestSend:(PSPinkelStarServer *) server
@@ -1392,7 +952,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// we publish to all networks at once, so all is left now is to show the close dialogue
 	// technically we could wait for the server to respond with a
 	// callback to psDidPublish, but we choose not to wait
-	DebugLog(@"PSMainViewController: publishPS: AlertDonePublishing now");
 	[self alertDonePublishing];
 }
 
@@ -1406,14 +965,12 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(void) psServerRequestFailed:(PSPinkelStarServer *) server
 {
 	// a server request failed. We now need to fail gracefully
-	DebugLog(@"Entering PSMainViewController:psServerRequestFailed");
 	
 	// We will add better error support later, and ensure the specific error can be found
 	// Most likely error is an incorrect APP key and secret.
 	if(_blockerLabel)
 	{
 		// update the text
-		DebugLog(@"PSMainController:psServerRequestFailed: there was a blocker view. Update the user message");
 		_blockerLabel.text = NSLocalizedString(@"No Internet detected. Please wait or press cancel to return", @"No Internet detected. Please wait or press cancel to return");
 	}
 	DebugLog(@"PSNavigationController:psServerRequestFailed: No blocker view. we do nothing");
@@ -1429,10 +986,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 -(void) psServerRequestSocialNetworkIconLoaded:(PSPinkelStarServer *) server
 {
 	// As soon as all icons are downloaded we update the interface
-	DebugLog(@"psServerRequestSocialNetworkIconLoaded: we received an icon, updating the view now");
-	
-	// hack, for now we update them all
-	// Overhead is minor, but it's ugly. The UI won't update anyways if there are no new icons
+
 	[self updateInterfaceIcons];
 }
 -(void) psInvalidApplicationKeySecret:(PSPinkelStarServer *) server
@@ -1440,8 +994,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// If you forget to enter your application key and secret in the
 	// pinkelstar.plist file this method will
 	// fire
-	DebugLog(@"psInvalidApplicationKeySecret: Unknown application key and/or secret. Please upate your pinkelstar.plist file with your app registration details");
-	
 	[self alertUnknownApplicationKeySecret];
 }
 
@@ -1459,47 +1011,43 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// else to nothing. The user needs to select a network first.
 }
 
+// PSSetttingsViewControllerDelegate
+// Called when the user has revoked a permission in the Settings View
+- (void)psPermissionRevoked:(PSSettingsViewController *)vController
+{
+	
+}
+
+// Called when the user has added a permission in the Setting View
+- (void)psPermissionAdded:(PSSettingsViewController *)vController
+{
+}
+
+// Called when the user presses the done button  in the Settings View
+- (void)psSettingsFinished:(PSSettingsViewController *)vController
+{
+	// We check to see if any social network buttons need to be selected/deselected
+	for(int i=0;i<[psServer numberOfSupportedSocialNetworks]; i++)
+		[self updateButtonState:[supportedNetworks getNetworkNameFromIndex:i]];
+	
+}
+
 // PSPermissionViewDelegate
 // Called when the dialog succeeds and is about to be dismissed.
 - (void)psPermissionViewDialogDidSucceed:(PSPermissionView *)pView
 {
-	DebugLog(@"Entering PSMainViewController:dialogDidSucceed: retrieved permission for %@", pView.networkName);
-	
 	// save that we are publishing now to prevent doubles
-	// hack we need to fix this. storePermissionPS is only local store
+
 	[supportedNetworks setWillPublishToNetwork:pView.networkName done:YES];
 	[supportedNetworks setSocialNetworkSelection:pView.networkName selected:YES];
 	[psServer storePermissionPS:pView.networkName];	
-
-	// we succeeded. Now check where we came from
-	if(_prefView.hidden)
-	{
-		// The original webview was started because of a publish button press
-		// check to see if we need more permissions
-		DebugLog(@"PSMainViewController:dialogDidSucceed: permission saved, now back to publishPS");
-		[self publishPS];
-	}
-	else {
-		// do nothing. The web view was started from the preference window.
-		// The user may want to set more prefs there.
-		DebugLog(@"PSMainViewController:dialogDidSucceed: preference dialogue finished succesfully");
-	}
-
-
+	[self publishPS];
 }
 
 // Called when the dialog is cancelled and is about to be dismissed.
 - (void)psPermissionViewDialogDidCancel:(PSPermissionView *)pView
 {
 	DebugLog(@"Entering PSMainViewController:dialogDidCancel");
-	// We need to check if we are in the preferences view or not
-	// if so, we need to reset the switch for this specific network to its original
-	// value
-	if(!_prefView.hidden)
-	{
-		DebugLog(@"dialogDidCancel: Toggling the switch for %@", pView.networkName);
-		[self toggleSocialNetworkPrefSwitch:pView.networkName];
-	}
 }
 
 // Called when permission dialog failed to load due to an error.

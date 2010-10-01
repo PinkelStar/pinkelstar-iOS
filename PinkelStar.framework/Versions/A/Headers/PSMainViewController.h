@@ -32,7 +32,9 @@ written authorization.
 //  Created by Alexander van Elsas on 6/17/10.
 
 #import <UIKit/UIKit.h>
+#import <UIKit/UIDevice.h>
 #import "PSMainViewControllerDelegate.h"
+#import "PSSettingsViewControllerDelegate.h"
 #import "PSPinkelStarServerDelegate.h"
 #import "PSPermissionViewDelegate.h"
 
@@ -50,15 +52,17 @@ typedef enum {
 @class PSLandscapeMainViewController;
 
 @interface PSMainViewController : UIViewController 
-<UITextFieldDelegate, PSPermissionViewDelegate, PSPinkelStarServerDelegate> {
+<UITextFieldDelegate, PSPermissionViewDelegate, PSSettingsViewControllerDelegate, PSPinkelStarServerDelegate> {
 	
-	id<PSMainViewControllerDelegate> _delegate;
+	id<PSMainViewControllerDelegate> _psMaindDelegate;
 	
 	// The PinkelStar server object
 	PSPinkelStarServer *psServer;	
 	
 	// All supprted social networks
 	PSSocialNetworks *supportedNetworks;
+	
+	UIView *_mainView;
 	
 	// MAIN UI Elements and sharing data
 	// 1. The user typed message
@@ -96,24 +100,13 @@ typedef enum {
 	// The blocker view is used to show the user when we are awaiting a server response
 	UIView *_blockerView;
 	UILabel *_blockerLabel;
-	
-	// the preferences window
-	UIView *_prefView;
-	UIButton *_donePrefButton;
-	// Obtained from the server
-	NSMutableArray *_socialNetworkPrefIcons;
-
-	// The scroll view with preferences
-	UIScrollView *_prefScrollView;
-	
-	// a list of UISwitch objects
-	NSMutableArray *_socialNetworkSwitches;
 }
 
 //the delegate
-@property(nonatomic,assign) id<PSMainViewControllerDelegate> delegate;
+@property(nonatomic,assign) id<PSMainViewControllerDelegate> psMainDelegate;
 
 // main view
+@property (nonatomic, retain) IBOutlet UIView *_mainView;
 @property (nonatomic, retain) IBOutlet UIImageView *_appIconView;
 @property (nonatomic, retain) IBOutlet UIScrollView *_buttonScrollView;
 @property (nonatomic, retain) IBOutlet UIButton *_cancelButton;
@@ -122,11 +115,6 @@ typedef enum {
 @property (nonatomic, retain) IBOutlet UIButton *_prefButton;
 @property (nonatomic, retain) UIWebView *permissionView;
 @property (nonatomic, retain) NSMutableArray *socialNetworkButtons;
-
-// preferences design
-@property (nonatomic, retain) IBOutlet UIView *_prefView;
-@property (nonatomic, retain) IBOutlet UIButton *_donePrefButton;
-@property (nonatomic, retain) IBOutlet UIScrollView *_prefScrollView;
 
 // Sharing data
 @property (nonatomic, retain) IBOutlet UITextField *userMessage;
@@ -161,7 +149,6 @@ typedef enum {
 -(IBAction) cancelButtonPressed;
 -(IBAction) publishButtonPressed;
 -(IBAction) prefButtonPressed;
--(IBAction) donePrefButtonPressed;
 -(IBAction) textFieldDoneEditing:(id)sender;
 -(IBAction)backgroundTap:(id)sender;
 

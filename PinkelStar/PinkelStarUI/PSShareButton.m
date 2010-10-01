@@ -152,13 +152,11 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	CGSize buttonSize = [self getButtonSize];
 	CGSize buttonIconSize = [self getButtonIconSize];
 	
-	DebugLog(@"Button Size =  (%f, %f), button icon size = (%f, %f)", buttonSize.width, buttonSize.height, buttonIconSize.width, buttonIconSize.height);
 	
 	// center the icon on the y-axis and use the same offset at the left side of the button
 	float offset = (buttonSize.height - buttonIconSize.height) / 2.0;
 	if(offset < 0)
 		offset= 0.0;
-	DebugLog(@"Icon frame is now: (%f, %f, %f, %f)", offset, offset, buttonIconSize.width, buttonIconSize.height);
 	return	CGRectMake(offset, offset, buttonIconSize.width, buttonIconSize.height);
 }
 
@@ -362,9 +360,7 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 			// we add an extra line to the label
 			_buttonTitle.numberOfLines = 2;
 			// we decrease the font size 1 pt
-			if(_buttonTitleFont)
-				[_buttonTitleFont release];
-			self.buttonTitleFont = [UIFont fontWithName:@"Helvetica-Bold" size:(11.0)];
+			_buttonTitleFont = [UIFont fontWithName:@"Helvetica-Bold" size:(11.0)];
 			_buttonTitle.font = _buttonTitleFont;
 			// recalculate values
 			labelSize = [_buttonTitle.text sizeWithFont:_buttonTitleFont];
@@ -386,13 +382,11 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 		case PSShareButtonStyleMediumGrey:
 		case PSShareButtonStyleLargeGrey:
 			// set shadow oppposite
-			_buttonTitle.shadowColor = [UIColor colorWithRed:0.8 green:0.8 blue:0.8 alpha:1.0];
-			return [UIColor blackColor];
+			_buttonTitle.shadowColor = [UIColor lightTextColor];
+			return [UIColor darkTextColor];
 			break;
 			
 		default:
-			// set shadow oppposite
-			_buttonTitle.shadowColor = [UIColor grayColor];
 			return [UIColor whiteColor];
 			break;
 	}
@@ -454,8 +448,7 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 		[_pinkelStarIconView removeFromSuperview]; // we don't need it anymore
 		_pinkelStarIconView = nil;
 	}
-	[_buttonTitleColor release];
-	self.buttonTitleColor = [self getButtonTitleColor];
+	_buttonTitleColor = [self getButtonTitleColor];
 	_buttonTitle.textColor = _buttonTitleColor;
 }
 
@@ -480,13 +473,13 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	[self addSubview:_pinkelStarIconView];
 	
 	// set the label
-	self.buttonTitleFont = [UIFont fontWithName:@"Helvetica-Bold" size:(12.0)];
-	self.buttonTitleColor = [UIColor whiteColor];
+	_buttonTitleFont = [UIFont fontWithName:@"Helvetica-Bold" size:(12.0)];
+	_buttonTitleColor = [UIColor whiteColor];
 	
 	_buttonTitle = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
 	_buttonTitle.font = _buttonTitleFont;
-	_buttonTitle.shadowColor = [UIColor grayColor];
-	_buttonTitle.shadowOffset = CGSizeMake(-1, -1);
+	_buttonTitle.shadowColor = [UIColor darkGrayColor];
+	_buttonTitle.shadowOffset = CGSizeMake(0, -1);
 	_buttonTitle.backgroundColor = [UIColor clearColor];
 	_buttonTitle.textColor = _buttonTitleColor;
 	_buttonTitle.numberOfLines = 1;
@@ -517,10 +510,10 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 }
 
 - (void)dealloc {
-	[_customImageName release];
-	[_customHighlightedImageName release];
-	[_buttonTitleFont release];
-	[_buttonTitleColor release];
+	if(_customImageName)
+		[_customImageName release];
+	if(_customHighlightedImageName)
+		[_customHighlightedImageName release];
 	[super dealloc];
 }
 

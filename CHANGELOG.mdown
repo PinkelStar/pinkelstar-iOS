@@ -1,5 +1,12 @@
-Changelog iOS PinkelStar framework v0.9.1.singleton.1
-=====================================================
+Changelog iOS PinkelStar framework and UI
+======================================
+
+Thursday September 30th, 2010
+-----------------------------
+- Refactored UI code, implementing UI ith UINavigationController
+- Cleaner code, more confirm HIG
+- Split out the Settings code into a separate PSSettingsViewController class
+- Added multiple device types to Server framework. PS now recognizes all types of iOS devices for analytics purposes
 
 Tuesday September 23st 2010
 ---------------------------

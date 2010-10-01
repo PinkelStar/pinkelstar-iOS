@@ -78,8 +78,6 @@ typedef enum {
 @property (nonatomic, retain) UIImage *applicationIcon;
 @property (nonatomic, retain) NSString *developerName;
 @property (nonatomic, retain) NSString *psSessionKey;
-@property (nonatomic, retain) NSMutableArray *psSocialNetworkList;
-@property (nonatomic, retain) NSMutableDictionary *psSocialNetworkIcons;
 @property (nonatomic) BOOL initialized;
 
 // Singleton implementation of the PinkelStar server
@@ -91,6 +89,11 @@ typedef enum {
 - (void)release;
 - (id)autorelease;
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PinkelStar Client UTILITY methods, useful for UI
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 // returns the version nr of the library
 + (NSString *) version;
@@ -99,8 +102,17 @@ typedef enum {
 -(NSString*)getApplicationName;
 -(NSString*)getDeveloperName;
 -(UIImage*)getApplicationIcon;
--(NSArray *) getSocialNetworksPS;
+// returns a list of supported social networks
+-(NSArray *) getSupportedSocialNetworks;
+-(int) numberOfSupportedSocialNetworks;
 -(UIImage *) getSocialNetworkIconPS:(NSString *)networkName size:(PSSocialNetworkIconSize)size;
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PinkelStar Client Server API
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Do we have user permission to allow PS to publish on his behalf?
 -(BOOL) canPublishPS:(NSString *) networkName;

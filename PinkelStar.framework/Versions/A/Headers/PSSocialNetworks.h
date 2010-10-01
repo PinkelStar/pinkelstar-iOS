@@ -32,10 +32,10 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-// This is a local copy of the server info related to the social
+// This is a convenience class to extract server info related to the social
 // networks that are supported
-// We maintain a list of social networks that the user has selected
-// and a list of network we have permission to publish too
+// Handy if you need some logic in your UI
+
 @interface PSSocialNetworks : NSObject {
 	// pairs of <networkName, (bool) is_selected>
 	NSMutableDictionary *selectedSocialNetworkList;
@@ -50,17 +50,11 @@
 @property (nonatomic, retain) NSMutableDictionary *selectedSocialNetworkList;
 @property (nonatomic, retain) NSMutableDictionary *willPublishToSocialNetworkList;
 
-// supported social networks
-// When the server sends us the list of supported networks we call this
-// to copy that list locally
--(void) updateSocialNetworks:(NSArray *) networkList;
 //convenient getters
--(NSArray *) getSupportedSocialNetworks;
 -(NSString *) getNetworkNameFromIndex:(NSUInteger) theIndex;
 -(NSString *) getNextSelectedSocialNetwork;
 // returns NSNotFound if object not found
 -(NSUInteger) getIndexFromNetworkName:(NSString *) networkName;
--(int) numberOfSupportedSocialNetworks;
 
 // Social Network selection
 -(BOOL) isSocialNetworkSelected:(NSString *) networkName;
