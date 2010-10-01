@@ -41,7 +41,7 @@
 #import	<PinkelStar/PSMainViewController.h>
 #import	<PinkelStar/PSMainViewControllerDelegate.h>
 #import	<PinkelStar/PSSettingsViewController.h>
-#import	<PinkelStar/PSSettingsControllerDelegate.h>
+#import	<PinkelStar/PSSettingsViewControllerDelegate.h>
 #import	<PinkelStar/PSPermissionViewDelegate.h>
 #import	<PinkelStar/PSShareButton.h>
 #import	<PinkelStar/PSShareButtonDelegate.h>
