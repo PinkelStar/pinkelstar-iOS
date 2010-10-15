@@ -36,6 +36,7 @@
 #import "PSPinkelStarServer.h"
 #import "PSSocialNetworks.h"
 #import "PSPermissionView.h"
+#import "PSMailViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreGraphics/CGImage.h>
 
@@ -96,7 +97,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 + (NSString *) version
 {
 	// return @"0.9.1";
-	return @"v.0.9.1.singleton.1";
+	//return @"v.0.9.1.singleton.1";
+	return @"v.0.9.2";
 	
 }
 
@@ -219,11 +221,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 		psServer = [PSPinkelStarServer sharedInstance];
 		psServer.delegate =  self;
 				
-		// Adding the buttonView now
-		_buttonScrollView.scrollEnabled = YES;
-		[_buttonScrollView setContentSize:CGSizeMake(200.0, 400.0)];
-		[_buttonScrollView setNeedsDisplay];
-		
 		// Set up the navigation controller
 		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
 		self.navigationItem.leftBarButtonItem = cancelButton;
@@ -250,6 +247,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 - (void)viewWillAppear:(BOOL)animated
 {
 	self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1.0];
+
+	_buttonScrollView.scrollEnabled = YES;
+	[_buttonScrollView setContentSize:CGSizeMake(200.0, 300.0)];
+	
 }
 
 -(void) setBlockerView:(NSString *)str
@@ -445,6 +446,25 @@ static CGFloat permissionViewOffsetY = 26.0;
 	
 }
 
+-(void) shareViaEmail
+{
+	PSMailViewController *mailController = [[[PSMailViewController alloc] init] autorelease];
+	mailController.psMailDelegate = self;
+	mailController.body = [NSString stringWithString:userMessage.text];
+	mailController.subj = [NSString stringWithString:_customShareMessageText];
+	// If you want your user to share an image, or other types of data try this for example:
+	// mailcontroller.image = [UIImage imageNamed:@"Whatever_image.png"];
+	// see the PSMailViewController.h file for more email share options
+	
+	if(_contentURL)
+		mailController.urlString  = [_contentURL absoluteString];
+
+	mailController.appName = [NSString stringWithString:[psServer getApplicationName]];
+	[mailController setupMailView];
+	[self presentModalViewController:mailController animated:YES];
+	   
+}
+	   
 // See if we can publish to a selected network.
 // If not, we ask for permission
 -(void)getSelectedNetworkPermission:(NSString *)networkName
@@ -458,12 +478,21 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// and call publishPS again, cause there may be other networks selected
 		[self publishPS];
 	}
-	else {
-		//This is where we start showing a modal window and request user permission
-		// Note that in the success callback this will recursively call
-		// publishPS again to see if we need to gather more network permissions
-		DebugLog(@"Getting permission now...");
-		[self getPermissionPS:networkName];
+	else 
+	{
+		// E-mail always needs a sender, so we start the e-mail view controller
+		if([networkName isEqual:@"email"])
+		{
+			[self shareViaEmail];
+		}
+		else 
+		{
+			//This is where we start showing a modal window and request user permission
+			// Note that in the success callback this will recursively call
+			// publishPS again to see if we need to gather more network permissions
+			DebugLog(@"Getting permission now...");
+			[self getPermissionPS:networkName];
+		}
 	}
 }
 
@@ -634,6 +663,18 @@ static CGFloat permissionViewOffsetY = 26.0;
 	if(buttonIndex != NSNotFound)
 	{
 		buttonImage = [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconMedium];
+		DebugLog(@"##########################################");
+		DebugLog(@"Updating the social network button icon for %@", networkName);
+		if([networkName isEqual:@"email"])
+		{
+			DebugLog(@"Setting up the e-mail button now");
+			if(buttonImage)
+				DebugLog(@"Halleluja, we found the email icon");
+			else {
+				DebugLog(@"Cannot find the email button icon");
+			}
+		}
+		DebugLog(@"##########################################");
 		if(buttonImage)
 		{				 
 			if ([self currentDeviceIsRetinaDisplay])
@@ -1054,6 +1095,17 @@ static CGFloat permissionViewOffsetY = 26.0;
 - (void)dialog:(PSPermissionView *)dialog didFailWithError:(NSError*)error
 {
 	DebugLog(@"Entering PSMainViewController:didFailWithError");
+	
+}
+
+// PSMailViewControllerDelegate
+// Called when the e-mail was sent succesfully
+-(void) psMailSendDidFinish:(PSMailViewController *)vController
+{
+	[self dismissModalViewControllerAnimated:YES];
+	[psServer storePermissionPS:@"email"];	
+	
+	[self publishPS];
 	
 }
 

@@ -473,7 +473,7 @@ static UIAccessibilityTraits *traitImage = nil, *traitButton = nil;
 	[self addSubview:_pinkelStarIconView];
 	
 	// set the label
-	_buttonTitleFont = [UIFont fontWithName:@"Helvetica-Bold" size:(12.0)];
+	_buttonTitleFont = [UIFont fontWithName:[NSString stringWithString:@"Helvetica-Bold"] size:(12.0)];
 	_buttonTitleColor = [UIColor whiteColor];
 	
 	_buttonTitle = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];

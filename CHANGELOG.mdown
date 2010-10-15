@@ -1,6 +1,11 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Monday October 11th 2010
+------------------------
+- Added e-mail sharing
+- New class that takes care of e-mail sharing is PSMailViewController
+
 Thursday September 30th, 2010
 -----------------------------
 - Refactored UI code, implementing UI ith UINavigationController

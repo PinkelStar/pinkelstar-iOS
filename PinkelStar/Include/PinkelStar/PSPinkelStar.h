@@ -45,4 +45,6 @@
 #import	<PinkelStar/PSPermissionViewDelegate.h>
 #import	<PinkelStar/PSShareButton.h>
 #import	<PinkelStar/PSShareButtonDelegate.h>
+#import	<PinkelStar/PSMailViewController.h>
+#import	<PinkelStar/PSMailViewControllerDelegate.h>
 

@@ -24,37 +24,29 @@
  written authorization. 
  
  */
+
 //
-//  PSSettingsViewController.h
+//  PSMailViewControllerDelegate.h
 //  pinkelstar
 //
-//  Created by Alexander van Elsas on 9/23/10.
+//  Created by Alexander van Elsas on 10/9/10.
 
-#import <UIKit/UIKit.h>
-#import "PSPermissionViewDelegate.h";
-#import "PSSettingsViewControllerDelegate.h";
+#import <Foundation/Foundation.h>
 
-// iPhone
+@class PSMailViewController;
 
-@interface PSSettingsViewController : UIViewController
-<PSPermissionViewDelegate> {
+@protocol PSMailViewControllerDelegate <NSObject>
 
-	id<PSSettingsViewControllerDelegate> _delegate;
-	
-	UITableView *_prefTableView;
-	UIImageView *_prefBackgroundView;
-	
-	// Obtained from the server
-	NSMutableDictionary *_socialNetworkPrefIcons;
-	
-	// a list of UISwitch objects
-	NSMutableDictionary *_socialNetworkSwitches;
-	
-}
+@optional
 
-// preferences design
-@property (nonatomic, retain) id<PSSettingsViewControllerDelegate> delegate;
-@property (nonatomic, retain) IBOutlet UITableView *_prefTableView;
-@property (nonatomic, retain) IBOutlet UIImageView *_prefBackgroundView;
+// Called when the user has revoked a permission
+- (void)psMailSendDidFinish:(PSMailViewController *)vController;
+
+// Called when the user has added a permission
+- (void)psMailSendDidCancel:(PSMailViewController *)vController;
+
+// Called when the user presses the done button
+- (void)psMailSendDidFail:(PSMailViewController *)vController;
+
 
 @end

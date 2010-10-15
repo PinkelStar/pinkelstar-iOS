@@ -1,17 +1,12 @@
-PinkelStar iPhone/iPhone4/iPad Framework v0.9.1.singleton.1
+PinkelStar iPhone/iPhone4/iPad Framework v0.9.2
 ===========================================================
 
-This is a separate branch of the PinkelStar iOS server Framework. We are implementing the PinkelStar server using the Singleton pattern. As you will see in the demo app, it allows us to load the PSMainViewController lazy, as it should be done. Please test at will. Once we are satisfied we will update the main branch of the project.
+This is the master branch of the PinkelStar iOS server Framework. 
 
 To use this framework you will need to register for a developer
 account at [PinkelStar](http://www.pinkelstar.com). Once registered, you can download the framework by cloning this repository :
 
     git clone git@github.com:PinkelStar/pinkelstar-iOS.git
-
-
-Make sure you switch to the correct branch using:
-
-	git checkout -b /remotes/origin/SingletonServer2
 	
 We advise to also get our demo app to see a working integration of PinkelStar in an iOS app. You can get a copy of the demo app by cloning this repository:
 

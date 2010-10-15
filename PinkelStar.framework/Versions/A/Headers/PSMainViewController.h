@@ -37,6 +37,7 @@ written authorization.
 #import "PSSettingsViewControllerDelegate.h"
 #import "PSPinkelStarServerDelegate.h"
 #import "PSPermissionViewDelegate.h"
+#import "PSMailViewControllerDelegate.h"
 
 #define psDegreesToRadians(x) (M_PI * x / 180.0)
 
@@ -49,10 +50,9 @@ typedef enum {
 
 @class PSSocialNetworks;
 @class PSPinkelStarServer;
-@class PSLandscapeMainViewController;
 
 @interface PSMainViewController : UIViewController 
-<UITextFieldDelegate, PSPermissionViewDelegate, PSSettingsViewControllerDelegate, PSPinkelStarServerDelegate> {
+<UITextFieldDelegate, PSPermissionViewDelegate, PSSettingsViewControllerDelegate, PSPinkelStarServerDelegate, PSMailViewControllerDelegate> {
 	
 	id<PSMainViewControllerDelegate> _psMaindDelegate;
 	

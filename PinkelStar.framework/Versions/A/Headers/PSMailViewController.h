@@ -24,37 +24,42 @@
  written authorization. 
  
  */
+
 //
-//  PSSettingsViewController.h
+//  PSMailViewController.h
 //  pinkelstar
 //
-//  Created by Alexander van Elsas on 9/23/10.
+//  Created by Alexander van Elsas on 10/8/10.
 
-#import <UIKit/UIKit.h>
-#import "PSPermissionViewDelegate.h";
-#import "PSSettingsViewControllerDelegate.h";
 
-// iPhone
+#import <Foundation/Foundation.h>
+#import <MessageUI/MessageUI.h>
+#import "PSMailViewControllerDelegate.h"
 
-@interface PSSettingsViewController : UIViewController
-<PSPermissionViewDelegate> {
-
-	id<PSSettingsViewControllerDelegate> _delegate;
-	
-	UITableView *_prefTableView;
-	UIImageView *_prefBackgroundView;
-	
-	// Obtained from the server
-	NSMutableDictionary *_socialNetworkPrefIcons;
-	
-	// a list of UISwitch objects
-	NSMutableDictionary *_socialNetworkSwitches;
-	
+@interface PSMailViewController : MFMailComposeViewController
+<MFMailComposeViewControllerDelegate> 
+{
+	id<PSMailViewControllerDelegate> _psMailDelegate;
+	NSString *_body;
+	NSString *_subj;
+	NSData *_data;
+	UIImage *_image;
+	NSString *_urlString;
+	NSString *_fileName;
+	NSString *_mimeType;
+	NSString *_appName;
 }
 
-// preferences design
-@property (nonatomic, retain) id<PSSettingsViewControllerDelegate> delegate;
-@property (nonatomic, retain) IBOutlet UITableView *_prefTableView;
-@property (nonatomic, retain) IBOutlet UIImageView *_prefBackgroundView;
+@property(nonatomic, retain) id<PSMailViewControllerDelegate> psMailDelegate;
+@property(nonatomic, retain) NSString *body;
+@property(nonatomic, retain) NSString *subj;
+@property(nonatomic, retain) NSData *data;
+@property(nonatomic, retain) UIImage *image;
+@property(nonatomic, retain) NSString *urlString;
+@property(nonatomic, retain) NSString *fileName;
+@property(nonatomic, retain) NSString *mimeType;
+@property(nonatomic, retain) NSString *appName;
+
+-(BOOL) setupMailView;
 
 @end
