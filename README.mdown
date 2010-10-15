@@ -34,7 +34,7 @@ Requirements
 ------------
 * Xcode (V2.x)
 * The latest iOS SDK (v4.x)
-* SystemConfiguration.framework, Foundation.framework, QuartzCore.framework, CoreGraphics.framework, UIKit.framework
+* SystemConfiguration.framework, Foundation.framework, QuartzCore.framework, CoreGraphics.framework, UIKit.framework, MessageUI.framework
 * PinkelStar.framework, and the PinkelStar folder containing code and resources
 
 Steps for setting up your first PinkelStar enabled iOS app :
