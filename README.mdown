@@ -49,7 +49,7 @@ Steps for setting up your first PinkelStar enabled iOS app :
 - Add all source code and resources
 	- In Finder, Locate the PinkelStar directory that was part of the git clone
 	- Select the folder and drag it into your Xcode project.
-	- Add #include <PSPinkelStar/PSCommon.h> in your projects' .pch file. It contains a DebugLog macro that we use to print debugging info to the console. You can enable this macro yourself by adding a -DPS_DEBUG_LOG flag to your linker
+	- Add #include <PinkelStar/PSCommon.h> in your projects' .pch file. It contains a DebugLog macro that we use to print debugging info to the console. You can enable this macro yourself by adding a -DPS_DEBUG_LOG flag to your linker
 
 - Enter your application key and secret
 	- You have to register your iPhone app at your developers dashboard panel on www.pinkelstar.com/account/applications
@@ -61,7 +61,7 @@ Steps for setting up your first PinkelStar enabled iOS app :
 
 - You are now all set to add a PinkelStar share or like button anywhere in your project.
 	- a. add the PSShareButtonDelegate and PSMainViewControllerDelegate protocol to the view controller in your project that will manage the PinkelStar button.
-	- b. `import <PinkelStar/PinkelStar.h>` where needed
+	- b. `import <PinkelStar/PSPinkelStar.h>` where needed
 	- c. Call [PSPinkelStarServer sharedInstance] at application launch. This will ensure that the PinkelStar sharing UI is up to date when the user invokes it
 	- d. Create a PSShareButton anywhere you want. It can be standard or your own custom button (check out the PSShareButton header file for details)
 	- e. Implement the psShareButtonPressed delegate callback and there, create a PSMainViewController object. Add it to your view.
