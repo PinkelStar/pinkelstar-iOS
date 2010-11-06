@@ -450,8 +450,12 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	PSMailViewController *mailController = [[[PSMailViewController alloc] init] autorelease];
 	mailController.psMailDelegate = self;
-	mailController.body = [NSString stringWithString:userMessage.text];
-	mailController.subj = [NSString stringWithString:_customShareMessageText];
+	if(userMessage)
+		if(userMessage.text)
+			mailController.body = [NSString stringWithString:userMessage.text];
+	if(_customShareMessageText)
+		mailController.subj = [NSString stringWithString:_customShareMessageText];
+
 	// If you want your user to share an image, or other types of data try this for example:
 	// mailcontroller.image = [UIImage imageNamed:@"Whatever_image.png"];
 	// see the PSMailViewController.h file for more email share options
