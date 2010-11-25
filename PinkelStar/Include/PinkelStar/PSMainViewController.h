@@ -48,6 +48,13 @@ typedef enum {
 	PSCustomEvent,
 } PSEventType;
 
+// We use these for convenience to set the status of the current sharing process
+typedef enum {
+	PSPublicationDone, // we succeeded and we can return to the app safely
+	PSAppKeySecretFail,		// Oops, teh developer forgot to set his App Key and Secret correctly in his plist file
+	PSNoNetworkSelected,	// The user wants to publish but didn't seelct any network to publish to
+} PSPublicationEventType;
+
 @class PSSocialNetworks;
 @class PSPinkelStarServer;
 
@@ -78,6 +85,14 @@ typedef enum {
 	//   can be used to share stuff that's available on the web
 	// Be aware that it replaces your landing page url in the share message on Twitter
 	NSURL *_contentURL;
+	
+	//5. A custom image URL. Set by the developer
+	//   Can be used to set a custom image to replace the application icon in the share message
+	// Be aware that it replaces your application icon in share messages. The image will appear in 
+	// networks that support it (e.g. Facebook, Buzz etc.) and will be visible on the landing page
+	// In the UI the custom image can also be used, it will be scaled down to 57x57. In the share message the original 
+	// size will be used
+	NSURL *_customImageURL;
 	
 	// The app icon, set by the developer during registration at www.pinkelstar.com/
 	UIImageView *_appIconView;
@@ -122,6 +137,7 @@ typedef enum {
 @property (nonatomic, retain) NSString *_customShareMessageText;
 @property (nonatomic) PSEventType eventType;
 @property (nonatomic, retain) NSURL *contentURL;
+@property (nonatomic, retain) NSURL *customImageURL;
 
 // The Social Network intelligence lies with the PinkelStar Server
 @property (nonatomic, retain) PSPinkelStarServer *psServer;

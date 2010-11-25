@@ -1,6 +1,16 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Thursday November 25th 2010
+------------------------
+- Updated the framework to use iOS 4.2
+- custom image sharing implemented. You can now set a custom image that replaces your app icon in individuel shares, both in the client UI and on the social networks
+- Fixed logic that shows the user when there is no Internet connection detected
+- Fixed logic to tell the developer that he is using an incorrect app key or secret
+- The blocker view now blocks the publish button from being pressed in the PSMainViewController UI
+- Fixed a crash of the permission web view. Turns out an object was over-released when the user dismissed the view
+- Fixed a crash in share via e-mail. 
+
 Monday October 11th 2010
 ------------------------
 - Added e-mail sharing

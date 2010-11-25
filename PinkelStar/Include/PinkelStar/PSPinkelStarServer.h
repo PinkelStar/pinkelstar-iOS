@@ -79,6 +79,7 @@ typedef enum {
 @property (nonatomic, retain) NSString *developerName;
 @property (nonatomic, retain) NSString *psSessionKey;
 @property (nonatomic) BOOL initialized;
+@property (nonatomic) BOOL developerAccepted;
 
 // Singleton implementation of the PinkelStar server
 + (PSPinkelStarServer *)sharedInstance;
@@ -96,12 +97,13 @@ typedef enum {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 // returns the version nr of the library
-+ (NSString *) version;
+- (NSString *) currentVersion;
 
 // UI information getters
 -(NSString*)getApplicationName;
 -(NSString*)getDeveloperName;
 -(UIImage*)getApplicationIcon;
+-(void)downloadCustomImage:(NSString *) imageURLString;
 // returns a list of supported social networks
 -(NSArray *) getSupportedSocialNetworks;
 -(int) numberOfSupportedSocialNetworks;
@@ -117,7 +119,7 @@ typedef enum {
 // Do we have user permission to allow PS to publish on his behalf?
 -(BOOL) canPublishPS:(NSString *) networkName;
 // Publish
--(void) publishPS:(NSString *) userMessage eventMessage:(NSString *) eventMessage contentUrl:(NSURL *)url networkList:(NSArray *)networkList;
+-(void) publishPS:(NSString *) userMessage eventMessage:(NSString *) eventMessage contentUrl:(NSURL *)url imageUrl:(NSURL *) imUrl networkList:(NSArray *)networkList;
 // Local storage only, this just caches the fact that we just got the permission formt he user in a dialogue locally
 // the server already knows this
 -(void) storePermissionPS:(NSString *)networkName;

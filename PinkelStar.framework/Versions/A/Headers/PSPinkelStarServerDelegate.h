@@ -48,6 +48,8 @@
 -(void) psServerRequestFinished:(PSPinkelStarServer *) server;
 // Gets called if the server has provided us with a social network icon
 -(void) psServerRequestSocialNetworkIconLoaded:(PSPinkelStarServer *) server;
+// Gets called if the server has downloaded an image from a custom url
+-(void) psImageDownloaded:(UIImage *) anImage;
 
 // Reachabibility
 // This fires if the PinkelStar server cannot be reached

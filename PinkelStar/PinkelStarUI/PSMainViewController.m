@@ -82,6 +82,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 @synthesize _prefButton;
 @synthesize socialNetworkButtons = _socialNetworkButtons;
 @synthesize contentURL = _contentURL;
+@synthesize customImageURL = _customImageURL;
 
 // start a dialogue to obtain permission to publish to a specific social network
 - (void) getPermissionPS:(NSString *) networkName
@@ -98,7 +99,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	// return @"0.9.1";
 	//return @"v.0.9.1.singleton.1";
-	return @"v.0.9.2";
+	//return @"v.0.9.2";
+	return @"v.0.9.3";
 	
 }
 
@@ -222,7 +224,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 		psServer.delegate =  self;
 				
 		// Set up the navigation controller
-		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
+		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", @"Cancel") style:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
 		self.navigationItem.leftBarButtonItem = cancelButton;
 
 		
@@ -236,7 +238,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 		[prefButtonItem release];
 		
 			
-		self.title = @"Share";
+		self.title = NSLocalizedString(@"Share", @"Share");
 		self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1.0];
 		
 		
@@ -250,6 +252,15 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 	_buttonScrollView.scrollEnabled = YES;
 	[_buttonScrollView setContentSize:CGSizeMake(200.0, 300.0)];
+	
+	// We should now check to see if the developer App Key and Secret are accepted or not
+	// If not we tell the dev he needs to set them
+	if(![PSPinkelStarServer sharedInstance].developerAccepted)
+	{
+		DebugLog(@"The Application Key and Secret are incorrect. Please close the app and update them correctly.");
+		//[self setBlockerView:@"The APP key and Secret are not recognized. Please fix that or the service will not run"];
+		_blockerLabel.text = NSLocalizedString(@"The Application Key and Secret are incorrect. Please close the app and update them correctly.", @"The Application Key and Secret are incorrect. Please close the app and update them correctly.");
+	}
 	
 }
 
@@ -282,6 +293,10 @@ static CGFloat permissionViewOffsetY = 26.0;
 	}
 	_blockerLabel.text = str;
 	[_blockerView addSubview: _blockerLabel];
+	
+	// make sure the Publish button doesn't respond to clicks while the blocker view is up
+	_publishButton.userInteractionEnabled = NO;
+	_prefButton.userInteractionEnabled = NO;
 }
 
 // Remove the spinner and text message
@@ -293,6 +308,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 		_blockerView = nil;
 		_blockerLabel = nil;
 	}
+	_publishButton.userInteractionEnabled = YES;
+	_prefButton.userInteractionEnabled = YES;
+
 }
 
 
@@ -322,6 +340,19 @@ static CGFloat permissionViewOffsetY = 26.0;
 	_contentURL = [url copy];
 }
 
+// The developer can set a custom content URL that is shared
+// This functionality will be supported shortly
+// Right now the content url is sent to the server but not displayed in the share yet
+-(void)addCustomImageURL:(NSURL *) url
+{
+	if(_customImageURL)
+	{
+		[_customImageURL release];
+		_customImageURL = nil;
+	}
+	
+	_customImageURL = [url copy];
+}
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -341,6 +372,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	_appIconView = nil;
 	_socialNetworkButtons = nil;
 	_contentURL = nil;
+	_customImageURL = nil;
 	_socialNetworkButtons = nil;
 }
 
@@ -355,6 +387,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 		[_customShareMessageText release];
 	if(_contentURL)
 		[_contentURL release];
+	if(_customImageURL)
+		[_customImageURL release];
 	
     [super dealloc];
 }
@@ -364,11 +398,13 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// We do not recognize the app, so prompt the developer
 	// that he needs to enter his application key and secret in the ApplictionDeveloper.plist file
 	// before he can use the PinkelStar service 
-	UIAlertView	*alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Application Key/Secret not set", @"Application Key/Secret not set") 
-														message:NSLocalizedString(@"Please enter your app Key and Secret in the pinkelstar.plist file", @"Please enter your app Key and Secret in the pinkelstar.plist file")
+	UIAlertView	*alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Application Key/Secret not set", @"Application Key/Secret not set correctly") 
+														message:NSLocalizedString(@"The Application Key and Secret are incorrect. Please close the app and update them correctly.", @"The Application Key and Secret are incorrect. Please close the app and update them correctly.")
 													   delegate:self 
 											  cancelButtonTitle:NSLocalizedString(@"OK", @"OK") 
 											  otherButtonTitles:nil];
+	// Set the tag to the correct state so that we can act smart when the alertview closes
+	alertView.tag = PSAppKeySecretFail;
 	[alertView show];
 	[alertView release];
 }
@@ -382,6 +418,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 													   delegate:self 
 											  cancelButtonTitle:NSLocalizedString(@"OK", @"OK") 
 											  otherButtonTitles:nil];
+	// Set the tag to the correct state so that we can act smart when the alertview closes
+	alertView.tag = PSNoNetworkSelected;
 	[alertView show];
 	[alertView release];
 }
@@ -398,6 +436,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 													   delegate:self 
 											  cancelButtonTitle:NSLocalizedString(@"OK", @"OK") 
 											  otherButtonTitles:nil];
+	// Set the tag to the correct state so that we can act smart when the alertview closes
+	alertView.tag = PSPublicationDone;
 	[alertView show];
 	[alertView release];
 	[alertMessage release];
@@ -431,10 +471,11 @@ static CGFloat permissionViewOffsetY = 26.0;
 		// Store locally that we now actually will publish
 		// DO NOT FORGET THIS, or you may run into an infinite loop of publish messages
 		[supportedNetworks willPublishNow];
-		
+
 		[psServer publishPS:self.userMessage.text 
 			   eventMessage:_customShareMessageText
 				 contentUrl:_contentURL
+				   imageUrl:_customImageURL
 				networkList:arr];
 	}
 	else
@@ -462,7 +503,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 	
 	if(_contentURL)
 		mailController.urlString  = [_contentURL absoluteString];
-
+	mailController.image = _appIconView.image;
+	
 	mailController.appName = [NSString stringWithString:[psServer getApplicationName]];
 	[mailController setupMailView];
 	[self presentModalViewController:mailController animated:YES];
@@ -497,7 +539,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 			DebugLog(@"Getting permission now...");
 			[self getPermissionPS:networkName];
 		}
-	}
+	}	
 }
 
 // This method finds the first/next network we need to publish to.
@@ -535,12 +577,16 @@ static CGFloat permissionViewOffsetY = 26.0;
 // set the host app icon in the view
 -(void) updateAppIcon
 {
-	UIImage *appIcon = [psServer getApplicationIcon];
-	if(appIcon)
-		_appIconView.image = appIcon;
-	else {
-		// do nothing
-		DebugLog(@"updateAppIcon: nothing to update");
+	if(!_customImageURL) // In this case the dev has set a custom image in the share. We do nothing to update it, otherwise it will be overwritten
+	{
+		UIImage *appIcon = [psServer getApplicationIcon];
+		if(appIcon)
+			_appIconView.image = appIcon;
+		else 
+		{
+			// do nothing
+			DebugLog(@"updateAppIcon: nothing to update");
+		}
 	}
 
 }
@@ -667,8 +713,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 	if(buttonIndex != NSNotFound)
 	{
 		buttonImage = [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconMedium];
-		DebugLog(@"##########################################");
-		DebugLog(@"Updating the social network button icon for %@", networkName);
 		if([networkName isEqual:@"email"])
 		{
 			DebugLog(@"Setting up the e-mail button now");
@@ -678,7 +722,6 @@ static CGFloat permissionViewOffsetY = 26.0;
 				DebugLog(@"Cannot find the email button icon");
 			}
 		}
-		DebugLog(@"##########################################");
 		if(buttonImage)
 		{				 
 			if ([self currentDeviceIsRetinaDisplay])
@@ -846,6 +889,20 @@ static CGFloat permissionViewOffsetY = 26.0;
 	[self updateAppIcon];
 }
 
+-(void) updateInterfaceWithImage:(UIImage *) anImage
+{
+	DebugLog(@"updateInterfaceWithImage: updating the UI with the new image now");
+	// update the UI by replacing the appIcon
+	// The image should be resized to the current 57x57 even though in the share it can be
+	// up to a size of 90x90;
+	if(!anImage)
+		DebugLog(@"WTF: the new image is nil");
+	// we should probably ensure the image isn't any bigger than 57x57 here.
+	
+	_appIconView.image = anImage;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Main button presses
@@ -882,6 +939,13 @@ static CGFloat permissionViewOffsetY = 26.0;
 	[self setBlockerView:message];
 }
 
+-(void) roundedCornerAppIcon
+{
+	// Setting the publish button to be rounded
+	[[_appIconView layer] setCornerRadius:8.0f];
+	[[_appIconView layer] setMasksToBounds:YES];
+}
+
 -(void) roundedCornerPublishButton
 {
 	// Setting the publish button to be rounded
@@ -896,6 +960,12 @@ static CGFloat permissionViewOffsetY = 26.0;
 	[[_publishButtonShine layer] setMasksToBounds:YES];
 	[[_publishButtonShine layer] setBorderWidth:1.0f];
 	[[_publishButtonShine layer] setBorderColor:[[UIColor clearColor] CGColor]];	
+}
+
+-(void) downloadCustomImage
+{
+	if(_customImageURL)
+		[[PSPinkelStarServer sharedInstance] downloadCustomImage:[_customImageURL absoluteString]];
 }
 
 // We set up parts of our view here
@@ -919,13 +989,21 @@ static CGFloat permissionViewOffsetY = 26.0;
 		[self updateInterfaceIcons];
 		
 	}
-	else 
+	else
+	{ 
 		// Create a spinner animation, until we have loaded our server settings
 		// As soon as the server init response is in, the psInit delegate method takes care of everything
-		[self setBlockerView:NSLocalizedString(@"Loading your settings...", @"Loading your settings...")];
-	
+		if([PSPinkelStarServer sharedInstance].developerAccepted)
+			[self setBlockerView:NSLocalizedString(@"Loading your settings...", @"Loading your settings...")];
+		else 
+			[self setBlockerView:NSLocalizedString(@"The Application Key and Secret are incorrect. Please close the app and update them correctly.", @"The Application Key and Secret are incorrect. Please close the app and update them correctly.")];
+			
+	}
+	// download a custom image if the developer has set one
+	[self downloadCustomImage];
 	// Setting the publish button to be rounded
 	[self roundedCornerPublishButton];
+	[self roundedCornerAppIcon];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1011,15 +1089,17 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	// a server request failed. We now need to fail gracefully
 	
-	// We will add better error support later, and ensure the specific error can be found
-	// Most likely error is an incorrect APP key and secret.
 	if(_blockerLabel)
 	{
-		// update the text
-		_blockerLabel.text = NSLocalizedString(@"No Internet detected. Please wait or press cancel to return", @"No Internet detected. Please wait or press cancel to return");
+		if(![PSPinkelStarServer sharedInstance].developerAccepted)
+			_blockerLabel.text = NSLocalizedString(@"The Application Key and Secret are incorrect. Please close the app and update them correctly.", @"The Application Key and Secret are incorrect. Please close the app and update them correctly.");
+		else
+		{
+			// We will add better error support later, and ensure the specific error can be found
+			// Most likely error is an incorrect APP key and secret.
+			_blockerLabel.text = NSLocalizedString(@"No Internet detected. Please wait or press cancel to return", @"No Internet detected. Please wait or press cancel to return");
+		}
 	}
-	DebugLog(@"PSNavigationController:psServerRequestFailed: No blocker view. we do nothing");
-	
 }
 
 -(void) psServerRequestFinished:(PSPinkelStarServer *) server
@@ -1034,6 +1114,15 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 	[self updateInterfaceIcons];
 }
+
+-(void) psImageDownloaded:(UIImage *) anImage;
+{
+	// As soon as this is called e update the UI and replace the current app icon
+	// with the image that has been downloaded.
+	DebugLog(@"We have received the downloaded image, updating the UI now");
+	[self updateInterfaceWithImage:anImage];
+}
+
 -(void) psInvalidApplicationKeySecret:(PSPinkelStarServer *) server
 {
 	// If you forget to enter your application key and secret in the
@@ -1045,15 +1134,21 @@ static CGFloat permissionViewOffsetY = 26.0;
 //UIAlertview delegate
 - (void)alertView:(UIAlertView *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
 	// the user clicked one of the OK/Cancel buttons
-	// Don't really care which one 
 	
 	// We should prob not use titles to determine the action needed ;-)
-	if([actionSheet.title isEqual:NSLocalizedString(@"Publication was succesful",@"Publication was succesful")]) // we are done, give control back to the app
-		[self finishPS];
-	if([actionSheet.title isEqual:NSLocalizedString(@"Application Key/Secret not set", @"Application Key/Secret not set")]) // close PinkelStar
-		[self finishPS];
-	
-	// else to nothing. The user needs to select a network first.
+	switch (actionSheet.tag) {
+		case PSPublicationDone:
+			[self finishPS];
+			break;
+		case PSAppKeySecretFail:
+			[self finishPS]; // we close, nothing we can do. The dev needs to set the app key and secret correctly
+			break;
+		case PSNoNetworkSelected:
+			// we do nothing, user takes control
+			break;
+		default:
+			break;
+	}
 }
 
 // PSSetttingsViewControllerDelegate
