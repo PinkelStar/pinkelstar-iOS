@@ -1083,6 +1083,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// called as soon as the client has received back a server response
 	// that tells us the publish request has finished
 	// We already told the user everyting is done, so we  don't do anything here
+	NSLog(@"PSDIDPUBLISH CALLEDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 }
 
 -(void) psServerRequestFailed:(PSPinkelStarServer *) server

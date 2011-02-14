@@ -1,6 +1,11 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Monday February 14th 2011
+------------------------
+- Updated the framework fixing a reported bug. When a user shares something on a social network the framework now calls the psDidPublish delegate method correctly
+- Updated the version for the framework to v0.9.4
+
 Thursday November 25th 2010
 ------------------------
 - Updated the framework to use iOS 4.2
