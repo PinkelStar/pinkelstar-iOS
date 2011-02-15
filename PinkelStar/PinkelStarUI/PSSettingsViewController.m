@@ -74,7 +74,6 @@ static CGFloat prefIconHeight = 34.0;
 // This methid prevents iOS to scale that image 2x (no need as it is high res already)
 -(UIImage *) adjustImageScaleForRetinaDisplay:(UIImage *) someImage width:(CGFloat)width height:(CGFloat) height
 { 
-	NSLog(@"Adjusting teh scale of an icon");
 	CGRect frame = CGRectMake(0, 0, width, height); 
 	UIGraphicsBeginImageContextWithOptions(CGSizeMake(width,height), NO, 2.0); // prevent iOS from scaling this again
 	[someImage drawInRect:frame]; 

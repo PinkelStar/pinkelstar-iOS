@@ -1,5 +1,12 @@
 Changelog iOS PinkelStar framework and UI
-======================================
+=========================================
+
+Tuesday February 15th 2011
+------------------------
+- Solved a reported bug that the email dialogue only appeared once. It now appears every time the user wants to share to email
+- Added new delegate methods to PSMainViewController. THis allows another class to be notified of server related responses. Please see the PSMainViewControllerDelegate.h file for more details.
+- Updated the version for the framework to v0.9.5
+
 
 Monday February 14th 2011
 ------------------------
@@ -9,7 +16,7 @@ Monday February 14th 2011
 Thursday November 25th 2010
 ------------------------
 - Updated the framework to use iOS 4.2
-- custom image sharing implemented. You can now set a custom image that replaces your app icon in individuel shares, both in the client UI and on the social networks
+- custom image sharing implemented. You can now set a custom image that replaces your app icon in individual shares, both in the client UI and on the social networks
 - Fixed logic that shows the user when there is no Internet connection detected
 - Fixed logic to tell the developer that he is using an incorrect app key or secret
 - The blocker view now blocks the publish button from being pressed in the PSMainViewController UI
@@ -23,18 +30,18 @@ Monday October 11th 2010
 
 Thursday September 30th, 2010
 -----------------------------
-- Refactored UI code, implementing UI ith UINavigationController
+- Refactored UI code, implementing UI with UINavigationController
 - Cleaner code, more confirm HIG
 - Split out the Settings code into a separate PSSettingsViewController class
 - Added multiple device types to Server framework. PS now recognizes all types of iOS devices for analytics purposes
 
-Tuesday September 23st 2010
+Tuesday September 23rd 2010
 ---------------------------
 - New branch with Singleton server implementation
-- Fixed inefficiency that caused the Applicaiton icon to be reloaded too often.
+- Fixed inefficiency that caused the Application icon to be reloaded too often.
 - Set version nr of this branch to v.0.9.1.singleton.1
 
-Tuesday September 22st 2010
+Tuesday September 22nd 2010
 ---------------------------
 - Fixed a bug that caused addCustmShareMessage not to function properly
 - Added a PSCommon.h file that includes our DebugLog code. Make sure to include that in your project .pch file
@@ -43,7 +50,7 @@ Tuesday September 22st 2010
 Wednesday September 8th 2010
 ----------------------------
 - Fixed a bug where the library would crash if the internet Connection went down
-- Reachability now autorecovers. If there is no Internet available the user will be notified properly. If the Internet returns, the user can continue its business properly
+- Reachability now auto recovers. If there is no Internet available the user will be notified properly. If the Internet returns, the user can continue its business properly
 
 Friday August 27th 2010
 -----------------------
@@ -56,7 +63,7 @@ Tuesday August 23rd 2010
 -------------------
 - Support for iPad
 - Simplified demo app
-- rewrote Readme.txt
+- rewrote Readme.mdown
 
 Wednesday August 18th 2010
 --------------------------

@@ -41,5 +41,29 @@
 //Called as soon as the pinkelstar process is finished
 - (void)psFinished:(PSMainViewController *)vController;
 
+// Gets called as soon as the server request to publish has been send away
+-(void) psPublishRequestSend:(PSMainViewController *) vController;
+// Gets called as soon as the server has actually responded to a server publish request
+-(void) psDidPublish:(PSMainViewController *) vController;
+// Gets called if a server request somehow failed
+-(void) psServerRequestFailed:(PSMainViewController *) vController;
+// Gets called if a server request is finished
+-(void) psServerRequestFinished:(PSMainViewController *) vController;
+
+// Reachabibility
+// This fires if the PinkelStar server cannot be reached
+-(void) psServerNotAvailable:(PSMainViewController *) vController;
+// This fires if we do not detect Internet on the phone
+-(void) psInternetNotAvailable:(PSMainViewController *) vController;
+// This fires if we do detect Internet on the phone (possibly after the connection was down before)
+-(void) psInternetAvailable:(PSMainViewController *) vController;
+
+// Unknown Application Key or Secret
+// ENTER your registration details in the pinkelstar.plist.
+// Otherwise the PinkelStar server will not handle your requests
+//
+// You can obtain an ApplicationKey and Secret by registering your app at
+// www.pinkelstar.com
+-(void) psInvalidApplicationKeySecret:(PSMainViewController *) vController;
 
 @end

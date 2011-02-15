@@ -100,7 +100,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// return @"0.9.1";
 	//return @"v.0.9.1.singleton.1";
 	//return @"v.0.9.2";
-	return @"v.0.9.3";
+	//return @"v.0.9.3";
+	//return @"v.0.9.4";
+	return @"v.0.9.5";
 	
 }
 
@@ -713,15 +715,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 	if(buttonIndex != NSNotFound)
 	{
 		buttonImage = [psServer getSocialNetworkIconPS:networkName size:PSSocialNetworkIconMedium];
-		if([networkName isEqual:@"email"])
-		{
-			DebugLog(@"Setting up the e-mail button now");
-			if(buttonImage)
-				DebugLog(@"Halleluja, we found the email icon");
-			else {
-				DebugLog(@"Cannot find the email button icon");
-			}
-		}
+
 		if(buttonImage)
 		{				 
 			if ([self currentDeviceIsRetinaDisplay])
@@ -1022,6 +1016,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	DebugLog(@"Entering PSMainViewController: psServerNotAvailable.");
 	// Wouldn't use this lightly. It can take a while to detect if there is no server available
 	//[self updateInterfaceWithReachability:@"The PinkelStar server cannot be reached. Please wait or press cancel to return"];
+
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psServerNotAvailable:)])
+		[_psMaindDelegate psServerNotAvailable:self];
 }
 
 // This fires if we do not detect Internet on the phone
@@ -1029,6 +1026,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 {
 	DebugLog(@"Entering PSMainViewController: psInternetNotAvailable. Updating the blocker message now");
 	[self updateInterfaceWithReachability:NSLocalizedString(@"No Internet detected. Please wait or press cancel to return",@"No Internet detected. Please wait or press cancel to return")];
+
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psInternetNotAvailable:)])
+		[_psMaindDelegate psInternetNotAvailable:self];
 }
 
 // This fires if we do detect Internet on the phone (again)
@@ -1044,6 +1044,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// initalized properly
 	if([_socialNetworkButtons count] > 0)
 		[self removeBlockerView];
+
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psInternetAvailable:)])
+		[_psMaindDelegate psInternetAvailable:self];
 }
 
 
@@ -1076,6 +1079,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// technically we could wait for the server to respond with a
 	// callback to psDidPublish, but we choose not to wait
 	[self alertDonePublishing];
+
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psPublishRequestSend:)])
+		[_psMaindDelegate psPublishRequestSend:self];
 }
 
 -(void) psDidPublish:(PSPinkelStarServer *) server
@@ -1083,7 +1089,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// called as soon as the client has received back a server response
 	// that tells us the publish request has finished
 	// We already told the user everyting is done, so we  don't do anything here
-	NSLog(@"PSDIDPUBLISH CALLEDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psDidPublish:)])
+		[_psMaindDelegate psDidPublish:self];
+	
 }
 
 -(void) psServerRequestFailed:(PSPinkelStarServer *) server
@@ -1101,12 +1109,16 @@ static CGFloat permissionViewOffsetY = 26.0;
 			_blockerLabel.text = NSLocalizedString(@"No Internet detected. Please wait or press cancel to return", @"No Internet detected. Please wait or press cancel to return");
 		}
 	}
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psServerRequestFailed:)])
+		[_psMaindDelegate psServerRequestFailed:self];
 }
 
 -(void) psServerRequestFinished:(PSPinkelStarServer *) server
 {
 	// use at your own convenience
 
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psServerRequestFinished:)])
+		[_psMaindDelegate psServerRequestFinished:self];
 }
 
 -(void) psServerRequestSocialNetworkIconLoaded:(PSPinkelStarServer *) server
@@ -1130,6 +1142,9 @@ static CGFloat permissionViewOffsetY = 26.0;
 	// pinkelstar.plist file this method will
 	// fire
 	[self alertUnknownApplicationKeySecret];
+
+	if(_psMaindDelegate != nil && [_psMaindDelegate respondsToSelector:@selector(psInvalidApplicationKeySecret:)])
+		[_psMaindDelegate psInvalidApplicationKeySecret:self];
 }
 
 //UIAlertview delegate
