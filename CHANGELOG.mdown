@@ -1,5 +1,11 @@
 Changelog iOS PinkelStar framework and UI
-=========================================
+======================================
+
+Wednesday February 15th 2011
+------------------------
+- Solved a reported bug where an ivar was accidentally renamed
+- Altered the PSMainViewController_iPhone.xib file to allow a bit more room for the developer's custom share message. realigned the app icon to balance the UI
+- Fixed an issue where the selection of email in the settings panel would pop up a permission view, which is unneeded.
 
 Tuesday February 15th 2011
 ------------------------

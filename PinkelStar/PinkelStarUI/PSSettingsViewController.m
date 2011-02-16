@@ -186,12 +186,19 @@ static CGFloat prefIconHeight = 34.0;
 	
 	if(setting)
 	{
-		if(![[PSPinkelStarServer sharedInstance] canPublishPS:networkName])
-			// open a modal view to get the permission
-			[self getPermissionPS:networkName];
-		else
-			// This is odd
-			DebugLog(@"socialNetworkSwitchChanged: switch is set to ON, but we already have permission according to the PinkelStar server??");
+		if(![networkName isEqualToString:@"email"])
+		{
+			if(![[PSPinkelStarServer sharedInstance] canPublishPS:networkName])
+			{
+				// open a modal view to get the permission
+				[self getPermissionPS:networkName];
+			}
+			else
+			{
+				// This is odd
+				DebugLog(@"socialNetworkSwitchChanged: switch is set to ON, but we already have permission according to the PinkelStar server??");
+			}
+		}
 	}
 	else 
 	{

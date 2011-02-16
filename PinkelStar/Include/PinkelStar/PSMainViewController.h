@@ -61,7 +61,7 @@ typedef enum {
 @interface PSMainViewController : UIViewController 
 <UITextFieldDelegate, PSPermissionViewDelegate, PSSettingsViewControllerDelegate, PSPinkelStarServerDelegate, PSMailViewControllerDelegate> {
 	
-	id<PSMainViewControllerDelegate> _psMaindDelegate;
+	id<PSMainViewControllerDelegate> _psMainDelegate;
 	
 	// The PinkelStar server object
 	PSPinkelStarServer *psServer;	
