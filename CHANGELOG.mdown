@@ -1,6 +1,10 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Thursday February 16th 2011
+------------------------
+- Solved a reported bug where the UI would (seemingly) randomly display incorrectly. The issue was that we tried to set up buttons in the scroll window before the object was loaded properly from the nib file.
+
 Wednesday February 15th 2011
 ------------------------
 - Solved a reported bug where an ivar was accidentally renamed

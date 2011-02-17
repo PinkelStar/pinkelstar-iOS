@@ -838,35 +838,40 @@ static CGFloat permissionViewOffsetY = 26.0;
 
 -(void) setupButtons
 {
-	// This is called when the server response is in. 
-	// we need to do 2 things:
-	// 1. Create a button for each social network that was returned by the server
-	// 2. Set it's status correct. If we already have permission to publish we
-	//    will select the button, otherwise we will deselect it
-	// Note that the actual network icons are loaded in the background
-	NSArray *networks = [psServer getSupportedSocialNetworks];
-	if([networks count] > 0)
+	// We should not set up anything yet if the view hasn't been loaded from the nib file yet
+	// We do a simple check, if there is no scroll view we do nothing here and await the view to be loaded
+	// this will be called then
+	if(_buttonScrollView != nil)
 	{
-		for(int i=0;i< [networks count]; i++)
+		// This is called when the server response is in. 
+		// we need to do 2 things:
+		// 1. Create a button for each social network that was returned by the server
+		// 2. Set it's status correct. If we already have permission to publish we
+		//    will select the button, otherwise we will deselect it
+		// Note that the actual network icons are loaded in the background
+		NSArray *networks = [psServer getSupportedSocialNetworks];
+		if([networks count] > 0)
 		{
-			// create the button and position it correctly in the interface
-			// We lay them out in a grid
-			[self createButton:[networks objectAtIndex:i]];
-			// check if we need to select it
-			NSString *networkName = [supportedNetworks getNetworkNameFromIndex:i];
-			if([psServer canPublishPS:networkName])
+			for(int i=0;i< [networks count]; i++)
 			{
-				// We keep a score locally. So store that we set the button
-				[supportedNetworks setSocialNetworkSelection:networkName selected:YES];
-				[self selectButton:[_socialNetworkButtons objectAtIndex:i] networkName:networkName];
+				// create the button and position it correctly in the interface
+				// We lay them out in a grid
+				[self createButton:[networks objectAtIndex:i]];
+				// check if we need to select it
+				NSString *networkName = [supportedNetworks getNetworkNameFromIndex:i];
+				if([psServer canPublishPS:networkName])
+				{
+					// We keep a score locally. So store that we set the button
+					[supportedNetworks setSocialNetworkSelection:networkName selected:YES];
+					[self selectButton:[_socialNetworkButtons objectAtIndex:i] networkName:networkName];
+				}
 			}
 		}
+		else 
+		{
+			DebugLog(@"PSMainViewController:setupButtons: There are no social networks to create buttons for");
+		}
 	}
-	else 
-	{
-		DebugLog(@"PSMainViewController:setupButtons: There are no social networks to create buttons for");
-	}
-
 }
 
 // Call when we know that the PinkelStar server has send us icons
