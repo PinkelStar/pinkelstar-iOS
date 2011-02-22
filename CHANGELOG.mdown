@@ -1,6 +1,10 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Tuesday February 22nd 2011
+------------------------
+- Renamed kReachabilityChangedNotification constant to avoid integration conflicts with Apple's Reachability class
+
 Thursday February 16th 2011
 ------------------------
 - Solved a reported bug where the UI would (seemingly) randomly display incorrectly. The issue was that we tried to set up buttons in the scroll window before the object was loaded properly from the nib file.
