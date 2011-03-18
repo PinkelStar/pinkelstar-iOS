@@ -1,9 +1,15 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Friday March 18th 2011
+------------------------
+- Made the PinkelStar framework compatible with iOS4.3.
+- Upgraded the version of the Framework to v.0.9.6
+
 Tuesday February 22nd 2011
 ------------------------
 - Renamed kReachabilityChangedNotification constant to avoid integration conflicts with Apple's Reachability class
+
 
 Thursday February 16th 2011
 ------------------------
