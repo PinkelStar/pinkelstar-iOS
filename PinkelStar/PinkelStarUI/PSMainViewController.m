@@ -103,7 +103,8 @@ static CGFloat permissionViewOffsetY = 26.0;
 	//return @"v.0.9.3";
 	//return @"v.0.9.4";
 	//return @"v.0.9.5";
-	return @"v.0.9.6";	
+	//return @"v.0.9.6";	
+	return @"v.0.9.7";	
 }
 
 

@@ -1,6 +1,11 @@
 Changelog iOS PinkelStar framework and UI
 ======================================
 
+Tuesday May 17th 2011
+---------------------
+- Fixed a bug where email would not appear in the options to share
+- Upgraded the version of the Framework to v.0.9.7
+
 Friday March 18th 2011
 ------------------------
 - Made the PinkelStar framework compatible with iOS4.3.
@@ -9,7 +14,6 @@ Friday March 18th 2011
 Tuesday February 22nd 2011
 ------------------------
 - Renamed kReachabilityChangedNotification constant to avoid integration conflicts with Apple's Reachability class
-
 
 Thursday February 16th 2011
 ------------------------
