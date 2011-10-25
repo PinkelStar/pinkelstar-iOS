@@ -31,8 +31,8 @@
 //  Created by Alexander van Elsas on 9/23/10.
 
 #import <UIKit/UIKit.h>
-#import "PSPermissionViewDelegate.h";
-#import "PSSettingsViewControllerDelegate.h";
+#import "PSPermissionViewDelegate.h"
+#import "PSSettingsViewControllerDelegate.h"
 
 // iPhone
 

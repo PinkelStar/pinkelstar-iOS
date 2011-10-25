@@ -227,7 +227,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 		psServer.delegate =  self;
 				
 		// Set up the navigation controller
-		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", @"Cancel") style:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
+		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", @"Cancel") style:UIBarButtonItemStylePlain target:self action:@selector(cancelButtonPressed)];
 		self.navigationItem.leftBarButtonItem = cancelButton;
 
 		
@@ -239,6 +239,7 @@ static CGFloat permissionViewOffsetY = 26.0;
 		UIBarButtonItem *prefButtonItem = [[UIBarButtonItem alloc] initWithCustomView:prefButton];
 		self.navigationItem.rightBarButtonItem = prefButtonItem;
 		[prefButtonItem release];
+        [cancelButton release];
 		
 			
 		self.title = NSLocalizedString(@"Share", @"Share");
